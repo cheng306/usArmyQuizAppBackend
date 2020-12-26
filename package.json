@@ -3,7 +3,6 @@
   "license": "MIT",
   "version": "0.0.0",
   "scripts": {
-    "build": "tsc && next build",
     "start": "tsc && nodemon bin/www",
     "lint": "eslint . --quiet --fix"
   },
