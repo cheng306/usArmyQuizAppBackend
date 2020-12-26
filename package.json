@@ -2,6 +2,9 @@
   "name": "usarmyquizappbackend",
   "version": "0.0.0",
   "private": true,
+  "engines": {
+    "node": ">=12.0.0"
+  },
   "scripts": {
     "start": "tsc && nodemon bin/www",
     "lint": "eslint . --quiet --fix"
@@ -25,7 +28,6 @@
     "jade": "~1.11.0",
     "morgan": "~1.9.1"
   },
-
   "devDependencies": {
     "@commitlint/cli": "^11.0.0",
     "@commitlint/config-conventional": "^11.0.0",
