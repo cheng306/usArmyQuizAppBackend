@@ -1,19 +1,16 @@
 import express, { Request, Response } from 'express';
 import { GetQuestionsBody } from '../../utils/apiTypes';
+import getQuestionRes from '../mock/getQuestionRes';
 
 const router = express.Router();
 
 // GET questions
 router.get('/questions', (req: Request, res: Response) => {
-  try {
-    const { unitId, unitType, questionCounts }: GetQuestionsBody = req.body;
-    console.log(unitId);
-    console.log(unitType);
-    console.log(questionCounts);
-  } catch (e) {
-    res.send({ errorMessage: 'Incorrect request body.' });
+  const { unitId, unitType, questionCounts }: GetQuestionsBody = req.body;
+  if (!unitId || !unitType || !questionCounts) {
+    return res.send({ errorMessage: 'Incorrect request body.' });
   }
-  res.send('questions');
+  return res.send(getQuestionRes);
 });
 
 export default router;

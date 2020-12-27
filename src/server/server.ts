@@ -1,12 +1,8 @@
 import * as http from 'http';
 import Debug from 'debug';
-import express from 'express';
 import app from '../app';
 
 const debug = Debug('usarmyquizappbackend:server');
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 
 const port: string = process.env.PORT || '3000';
 app.set('port', port);
