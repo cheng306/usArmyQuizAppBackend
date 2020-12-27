@@ -12,14 +12,18 @@ Backend server for the application
 
 3. Run `yarn` to install modules.
 
-4. Run `ssh -N -L 1433:churchdb.cg0kmmjkhs8h.us-west-2.rds.amazonaws.com:1433 ec2-user@ec2-54-190-53-29.us-west-2.compute.amazonaws.com -i ~/.ssh/churchAWS.pem` in the terminal, change path if needed.
+4. Add in a file call `.env` to the root.
 
-5. Run  `yarn start`, then the backend server should be running at `http://localhost:3000`.
+5. Copy content from `.env.sample` to `.env` and fill out the information.
+
+6. Run `ssh -N -L 1433:churchdb.cg0kmmjkhs8h.us-west-2.rds.amazonaws.com:1433 ec2-user@ec2-54-190-53-29.us-west-2.compute.amazonaws.com -i ~/.ssh/churchAWS.pem` in the terminal, change path if needed.
+
+7. Run  `yarn start`, then the backend server should be running at `http://localhost:3000`.
 
 ## Submit workflow
 
 1. Check out from dev
-2. Create new branch when working on new feature
+2. Create new branch when working on new feature and use pull request to update dev
 3. Merge dev to main when ready to deploy
 
 ## AWS
