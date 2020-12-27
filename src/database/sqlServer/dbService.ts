@@ -1,7 +1,8 @@
 import { UnitType } from '../../utils/enums';
+import { connectionPool } from './db';
 
-export function isDBConnected() {
-  return true;
+export function isDBConnected(): boolean {
+  return connectionPool.connected;
 }
 
 export function getParentUnit(unitId: number, parentUnitType: UnitType) {

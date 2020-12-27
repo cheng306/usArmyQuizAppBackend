@@ -11,7 +11,7 @@ router.get('/questions', (req: Request, res: Response) => {
     console.log(unitType);
     console.log(questionCounts);
   } catch (e) {
-    res.send('err: wrong body');
+    res.send({ errorMessage: 'Incorrect request body.' });
   }
   res.send('questions');
 });

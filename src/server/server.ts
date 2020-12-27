@@ -16,7 +16,8 @@ const server = http.createServer(app);
 
 // Listen on provided port, on all network interfaces.
 server.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Server running in ${process.env.NODE_ENV}`);
+  console.log(`URL: http://localhost:${port}`);
 });
 
 server.on('listening', () => {
