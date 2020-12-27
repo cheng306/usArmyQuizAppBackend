@@ -8,7 +8,8 @@
   "scripts": {
     "build": "tsc && src/server/server.ts",
     "start": "tsc && nodemon src/server/server.ts",
-    "lint": "eslint . --quiet --fix"
+    "lint": "eslint . --quiet --fix",
+    "test": ""
   },
   "husky": {
     "hooks": {
