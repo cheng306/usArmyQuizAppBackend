@@ -11,7 +11,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: false,
 }));
-app.use(cors());
+app.use(cors({
+  origin: ['https://us-army-quiz.netlify.app', 'http://localhost:3000'],
+  optionsSuccessStatus: 200,
+}));
 
 app.use(
   indexRouter,
