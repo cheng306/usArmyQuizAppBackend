@@ -4,7 +4,7 @@ export type GetQuestionsBody = {
   questionCounts: number
 };
 
-type Question = {
+export type Question = {
   question: string,
   choices: [string],
   correctChoiceIndex: number

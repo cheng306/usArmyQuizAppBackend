@@ -4,16 +4,14 @@ import { GetQuestionsBody } from '../../utils/apiTypes';
 const router = express.Router();
 
 // GET questions
-router.get('/questions', (req: Request, res: Response) => {
+router.post('/questions', (req: Request, res: Response) => {
+  console.log(req.body);
   try {
     const { unitId, unitType, questionCounts }: GetQuestionsBody = req.body;
-    console.log(unitId);
-    console.log(unitType);
-    console.log(questionCounts);
   } catch (e) {
-    res.send({ errorMessage: 'Incorrect request body.' });
+    return res.send({ errorMessage: 'Incorrect request body.' });
   }
-  res.send('questions');
+  return res.send({ errorMessage: 'Incorrect request body.' });
 });
 
 export default router;
