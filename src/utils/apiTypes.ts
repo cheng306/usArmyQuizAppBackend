@@ -6,7 +6,7 @@ export type GetQuestionsBody = {
 
 export type Question = {
   question: string,
-  choices: [string],
+  choices: string[],
   correctChoiceIndex: number
 };
 
