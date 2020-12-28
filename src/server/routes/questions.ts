@@ -10,7 +10,7 @@ router.get('/questions', (req: Request<unknown, unknown, unknown, GetQuestionsBo
   const { unitId, questionType, questionCounts }: GetQuestionsBody = req.query;
   if (
     !parseInt(String(unitId), 10)
-    || !parseUnitType(questionType.toLowerCase())
+    || !parseUnitType(questionType)
     || !parseInt(String(unitId), 10)
     || questionCounts < 0
     || questionCounts > 50
