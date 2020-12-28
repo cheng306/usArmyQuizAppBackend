@@ -8,6 +8,6 @@ export enum UnitType {
 
 const unitTypeMap: Map<string, UnitType> = new Map([['division', UnitType.DIVISION], ['brigade', UnitType.BRIGADE], ['battalion', UnitType.BATTALION], ['company', UnitType.COMPANY]]);
 
-export function convertUnitType(unitType: string) {
+export function parseUnitType(unitType: string) {
   return unitTypeMap.get(unitType);
 }
