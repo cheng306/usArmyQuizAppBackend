@@ -16,7 +16,7 @@ Backend server for the application
 
 5. Copy content from `.env.sample` to `.env` and fill out the information.
 
-6. Run `ssh -L 1433:churchdb.cg0kmmjkhs8h.us-west-2.rds.amazonaws.com:1433 ec2-user@ec2-54-190-53-29.us-west-2.compute.amazonaws.com -i ~/.ssh/churchAWS.pem` in the terminal, change path if needed.
+6. Run `ssh -L 1433:{RDS_ENDPOINT}:1433 {EC2_USER}@{EC2_ENDPOINT} -i {SSH_KEY_PATH}` in the terminal.
 
 7. Run  `yarn start`, then the backend server should be running at `http://localhost:3000`.
 
