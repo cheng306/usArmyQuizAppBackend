@@ -13,3 +13,8 @@ export type Question = {
 export type GetQuestionsResponse = {
   questions: [Question]
 };
+
+export type Unit = {
+  id: number,
+  name: string
+}
