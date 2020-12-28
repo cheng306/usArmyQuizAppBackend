@@ -11,4 +11,4 @@ const db = connectionPool.connect().then(() => {
   console.log(`err: ${err}`);
 });
 
-export { connectionPool, db };
+export { connectionPool, db, sql };
