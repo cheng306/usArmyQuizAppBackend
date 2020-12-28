@@ -1,12 +1,9 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import indexRouter from './server/routes/index';
 import questionsRouter from './server/routes/questions';
 import unitsRouter from './server/routes/units';
-
-dotenv.config();
 
 const app = express();
 
