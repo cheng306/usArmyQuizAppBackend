@@ -1,7 +1,4 @@
 import { config } from 'mssql';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 const dbConfig: config = {
   user: process.env.RDS_USERNAME,
