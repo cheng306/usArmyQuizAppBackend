@@ -19,7 +19,7 @@ export function getUnits(unitType: UnitType, parentUnitId: number) {
 export function getAllUnits(): Promise<Unit[]> {
   return db.then(() => {
     const request = new sql.Request(connectionPool);
-    return request.query('select ID, name from DeNormalize');
+    return request.query('select id, name from DeNormalize');
   }).then((res) => res.recordset).catch((err) => {
     console.log(err);
     throw err;
