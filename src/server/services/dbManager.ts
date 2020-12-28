@@ -1,4 +1,3 @@
-import { rejects } from 'assert';
 import { UnitType } from '../../utils/enums';
 import { Unit } from '../../utils/apiTypes';
 import { getAllUnits as dbGetAllUnits, isDBConnected } from '../../database/sqlServer/dbService';

@@ -5,9 +5,7 @@ const connectionPool = new sql.ConnectionPool(dbConfig, (res) => {
   console.log(`res: ${res}`);
 });
 
-const db = connectionPool.connect().then(() => {
-  console.log('success!');
-}).catch((err) => {
+const db = connectionPool.connect().catch((err) => {
   console.log(`err: ${err}`);
 });
 
