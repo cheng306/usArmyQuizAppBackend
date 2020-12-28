@@ -9,14 +9,16 @@ const router = express.Router();
 router.get('/questions', (req: Request<unknown, unknown, unknown, GetQuestionsBody>, res: Response) => {
   const { unitId, questionType, questionCounts }: GetQuestionsBody = req.query;
   if (
-    !parseInt(String(unitId), 10)
+    !Number.isInteger(parseInt(String(unitId), 10))
     || !parseUnitType(questionType)
-    || !parseInt(String(unitId), 10)
-    || questionCounts < 0
-    || questionCounts > 50
+    || !Number.isInteger(parseInt(String(questionCounts), 10))
   ) {
     res.status(404);
     return res.send({ errorMessage: 'Invalid request query.' });
+  }
+  if (questionCounts < 0 || questionCounts > 50) {
+    res.status(404);
+    return res.send({ errorMessage: 'questionCounts out of range(0 - 50).' });
   }
   const questions: Question[] = [];
   for (let i = 0; i < questionCounts; i += 1) {
