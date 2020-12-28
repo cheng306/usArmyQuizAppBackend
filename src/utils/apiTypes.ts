@@ -1,6 +1,6 @@
 export type GetQuestionsBody = {
   unitId: number,
-  unitType: string,
+  questionType: string,
   questionCounts: number
 };
 
