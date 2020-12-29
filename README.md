@@ -30,4 +30,9 @@ Backend server for the application
 
 Changes in main branch is automatcally reflected on AWS beanstalk: Backend-env.eba-vppruamm.us-west-2.elasticbeanstalk.com 
 
+## testing for backend
+run `yarn test` to run all test points
+
+to add test point, you can follow test point "test get request of /" with modified channel name, input request data and expected response
+
 
