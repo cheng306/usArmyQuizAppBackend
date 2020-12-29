@@ -31,7 +31,6 @@ router.get('/questions', (req: Request<unknown, unknown, unknown, GetQuestionsBo
     return res.send(questions);
   }
   const type = parseUnitType(questionType)!;
-  getRandomQuestions(unitId, type, questionCounts);
-  return res.send(questions);
+  return getRandomQuestions(unitId, type, questionCounts).then((randomQuestions: Question[]) => res.send(randomQuestions));
 });
 export default router;
