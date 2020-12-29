@@ -23,7 +23,7 @@ router.get('/questions', (req: Request<unknown, unknown, unknown, GetQuestionsBo
   }
 
   const questions: Question[] = [];
-  if (process.env.USING_MOCK === 'FALSE') {
+  if (process.env.USING_MOCK === 'TRUE') {
     for (let i = 0; i < questionCounts; i += 1) {
       questions.push(question);
     }
