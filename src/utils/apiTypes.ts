@@ -1,3 +1,5 @@
+import { Polarity, UnitType } from './enums';
+
 export type GetQuestionsBody = {
   unitId: number,
   questionType: string,
@@ -16,5 +18,6 @@ export type GetQuestionsResponse = {
 
 export type Unit = {
   id: number,
-  name: string
+  name: string,
+  type: UnitType
 }

@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import { GetQuestionsBody, Question } from '../../utils/apiTypes';
 import question from '../mock/question';
 import { parseUnitType } from '../../utils/enums';
+import { getRandomQuestions } from '../services/questionService';
 
 const router = express.Router();
 
@@ -20,12 +21,17 @@ router.get('/questions', (req: Request<unknown, unknown, unknown, GetQuestionsBo
     res.status(404);
     return res.send({ errorMessage: 'questionCounts out of range(0 - 50).' });
   }
+
   const questions: Question[] = [];
-  for (let i = 0; i < questionCounts; i += 1) {
-    questions.push(question);
+  if (process.env.USING_MOCK === 'FALSE') {
+    for (let i = 0; i < questionCounts; i += 1) {
+      questions.push(question);
+    }
+    res.status(200);
+    return res.send(questions);
   }
-  res.status(200);
+  const type = parseUnitType(questionType)!;
+  getRandomQuestions(unitId, type, questionCounts);
   return res.send(questions);
 });
-
 export default router;
