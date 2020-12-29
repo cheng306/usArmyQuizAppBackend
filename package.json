@@ -9,7 +9,7 @@
     "build": "tsc && NODE_ENV=production nodemon src/server/server.ts",
     "start": "tsc && NODE_ENV=development nodemon src/server/server.ts",
     "lint": "eslint . --quiet --fix",
-    "test": "NODE_ENV=development mocha -r ts-node/register test/test.ts"
+    "test": "NODE_ENV=development mocha -r ts-node/register test/**/*.ts"
   },
   "husky": {
     "hooks": {
