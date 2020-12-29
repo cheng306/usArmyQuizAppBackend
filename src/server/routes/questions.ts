@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import { GetQuestionsBody, Question } from '../../utils/apiTypes';
 import question from '../mock/question';
 import { parseUnitType } from '../../utils/enums';
-import { getRandomQuestions } from '../services/questionService';
+import getRandomQuestions from '../services/questionService';
 
 const router = express.Router();
 
