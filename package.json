@@ -7,7 +7,7 @@
   },
   "scripts": {
     "build": "tsc && NODE_ENV=production nodemon src/server/server.ts",
-    "start": "tsc && NODE_ENV=development nodemon src/server/server.ts",
+    "start": "tsc && nodemon src/server/server.ts",
     "lint": "eslint . --quiet --fix"
   },
   "husky": {
