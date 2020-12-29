@@ -5,7 +5,9 @@ const router = express.Router();
 
 // GET index
 router.get('/', (req: Request, res: Response) => {
-  res.send({ isDBConnected: isDBConnected(), Environment: process.env.NODE_ENV });
+  isDBConnected().then((dbConnected) => {
+    res.send({ isDBConnected: dbConnected, Environment: process.env.NODE_ENV });
+  });
 });
 
 export default router;

@@ -21,6 +21,6 @@ export function getAllUnits(): Promise<Unit[]> {
     }
     return dbGetAllUnits();
   }).then((units: Unit[]) => units).catch((err) => {
-    throw err;
+    throw new Error('An unexpected error has occurs.');
   });
 }

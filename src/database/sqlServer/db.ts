@@ -1,9 +1,7 @@
 import sql from 'mssql';
 import dbConfig from './dbConfig';
 
-const connectionPool = new sql.ConnectionPool(dbConfig, (res) => {
-  console.log(`res: ${res}`);
-});
+const connectionPool = new sql.ConnectionPool(dbConfig);
 
 const db = connectionPool.connect().catch((err) => {
   console.log(`err: ${err}`);
