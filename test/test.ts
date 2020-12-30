@@ -5,7 +5,7 @@ import app from '../src/app';
 import 'mocha';
 
 describe('Test application', () => {
-  let server:any;
+  let server: http.Server;
 
   before((done) => {
     const port: string = process.env.PORT || '3000';
@@ -65,8 +65,8 @@ describe('Test application', () => {
           return done(err);
         }
         // expect(res.body.isDBConnected).to.equal(true);
-        expect(res.body.Environment).to.equal('development');
-        console.log(res.body);
+        // expect(res.body.Environment).to.equal('development');
+        expect(res.body.NodeVersion).to.equal('12.0.0');
         return done();
       });
   });

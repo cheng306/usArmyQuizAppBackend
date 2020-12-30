@@ -3,17 +3,17 @@
   "version": "0.0.0",
   "license": "MIT",
   "engines": {
-    "node": "14.15.3"
+    "node": "12.0.0"
   },
   "scripts": {
     "build": "tsc && NODE_ENV=production nodemon src/server/server.ts",
     "start": "tsc && NODE_ENV=development nodemon src/server/server.ts",
-    "lint": "eslint . --quiet --fix",
+    "lint": "eslint . --fix --max-warnings=0",
     "test": "NODE_ENV=development mocha -r ts-node/register test/**/*.ts"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "yarn lint",
+      "pre-commit": "yarn lint && yarn test",
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
   },

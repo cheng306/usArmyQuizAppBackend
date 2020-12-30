@@ -1,12 +1,17 @@
 import express, { Request, Response } from 'express';
-import { isDBConnected } from '../../database/sqlServer/dbService';
+import { getUnit, isDBConnected } from '../../database/sqlServer/dbService';
 
 const router = express.Router();
 
 // GET index
 router.get('/', (req: Request, res: Response) => {
+  getUnit(90000).then((rs) => {
+    console.log(rs);
+  }).catch((err) => {
+    console.log(err);
+  });
   isDBConnected().then((dbConnected) => {
-    res.send({ isDBConnected: dbConnected, Environment: process.env.NODE_ENV });
+    res.send({ isDBConnected: dbConnected, Environment: process.env.NODE_ENV, NodeVersion: process.versions.node });
   });
 });
 
