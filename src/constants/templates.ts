@@ -21,6 +21,22 @@ const templates: QuestionTemplate[] = [
     answer: UnitType.COMPANY,
     polarity: Polarity.NEGATIVE,
   },
+  {
+    id: 2,
+    type: UnitType.BRIGADE,
+    text: 'Which company belongs to :TOKEN: ?',
+    token: UnitType.BRIGADE,
+    answer: UnitType.COMPANY,
+    polarity: Polarity.POSITIVE,
+  },
+  {
+    id: 3,
+    type: UnitType.BRIGADE,
+    text: 'Which company does NOT belong to :TOKEN: ?',
+    token: UnitType.BRIGADE,
+    answer: UnitType.COMPANY,
+    polarity: Polarity.NEGATIVE,
+  },
   /*
     {
         id: 2,

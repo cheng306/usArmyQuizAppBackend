@@ -11,6 +11,7 @@ import {
 import templates from '../../constants/templates';
 import { getMutipleRandomInt, randomIntFromInterval, unitTypeToLevel } from '../../utils/commons';
 import { Question, QuestionTemplate, Unit } from '../../utils/apiTypes';
+import { Console } from 'console';
 
 /**
  * Get a valid token for the given question template
@@ -22,7 +23,11 @@ function getToken(
   unit: Unit,
   template: QuestionTemplate,
 ): Promise<Unit> {
-  return getRelationship(unit.id, template.token).then((childUnits: Unit[]) => childUnits[randomIntFromInterval(0, childUnits.length)]);
+  return getRelationship(unit.id, template.token).then((childUnits: Unit[]) => {
+    return childUnits[randomIntFromInterval(0, childUnits.length-1)];
+  }).catch((err) => {
+    throw new Error('Unable to fetch question token');
+  });
 }
 
 /**
@@ -42,7 +47,11 @@ function getAnswer(
     answers = token.then((unit: Unit) => getNegativeRelationship(unit.id, template.answer));
   }
 
-  return answers.then((child: Unit[]) => child[randomIntFromInterval(0, child.length)]);
+  return answers.then((child: Unit[]) => {
+    return child[randomIntFromInterval(0, child.length-1)]
+  }).catch((err) => {
+    throw new Error('Unable to fetch question answer');
+  });
 }
 
 /**
@@ -71,6 +80,8 @@ function getOtherChoices(
       result.push(tchildUnits[idx[i]]);
     }
     return result;
+  }).catch((err) => {
+    throw new Error('Unable to fetch question choices');
   });
 }
 
@@ -102,7 +113,7 @@ function generateQuestionFromTemplate(
   const promiseList: [Promise<Unit>, Promise<Unit>, Promise<Unit[]>] = [token, answer, otherChoices];
   return Promise.all(promiseList).then((results) => {
     const text: string = template.text.replace(/:TOKEN:/gi, results[0].name);
-    const correctIdx = randomIntFromInterval(0, 3);
+    const correctIdx = randomIntFromInterval(0, 2);
     const choices: string[] = [];
 
     let j = 0;
@@ -120,6 +131,8 @@ function generateQuestionFromTemplate(
       choices,
       correctChoiceIndex: correctIdx,
     };
+  }).catch((err) => {
+    throw err;
   });
 }
 
@@ -163,12 +176,14 @@ function generateQuestions(
   const validTemplate = getValidQuestionsForUnitTypes(unit.unitType!);
   const questionsAsync: Promise<Question>[] = [];
   for (let i = 0; i < questionCount; i += 1) {
-    const idx = randomIntFromInterval(0, validTemplate.length);
+    const idx = randomIntFromInterval(0, validTemplate.length-1);
     const template = validTemplate[idx];
     questionsAsync.push(generateQuestionFromTemplate(unit, template));
   }
 
-  return Promise.all(questionsAsync).then((questions: Question[]) => questions);
+  return Promise.all(questionsAsync).then((questions: Question[]) => questions).catch((err) => {
+    throw err;
+  });
 }
 
 /**
@@ -205,5 +220,7 @@ export default function getRandomQuestions(
       return new Promise<Unit[]>((res) => { res([unit]); });
     }
     throw NOTIMP;
-  }).then((unit: Unit[]) => generateQuestions(unit[0], questionCount));
+  }).then((unit: Unit[]) => generateQuestions(unit[0], questionCount)).catch((err) => {
+    throw err;
+  });
 }
