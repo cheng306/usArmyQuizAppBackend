@@ -1,93 +1,92 @@
 import { UnitType } from '../../utils/enums';
-import * as dbService from '../../database/sqlServer/dbService';
-import Unit from '../../utils/Unit';
+import { Unit } from '../../utils/apiTypes';
+import {
+  getAllUnits as dbGetAllUnits,
+  getNegativeRelationship as dbGetNegativeRelationship,
+  getRelationship as dbGetRelationship,
+  getUnit as dbGetUnit,
+  getUnitType as dbGetUnitType,
+  isDBConnected,
+} from '../../database/sqlServer/dbService';
 
-export function getParentUnit(unitId: number, parentUnitType: UnitType) {
-  return `${unitId}${parentUnitType}`;
-}
-
-export function getUnits(unitType: UnitType, parentUnitId: number) {
-  return `${unitType}${parentUnitId}`;
-}
-
-export function deNormalizeUnit(unitId: number) {
-  return `${unitId}`;
-}
-
-export function getAllUnits(): Promise<Unit[]> {
-  return dbService.isDBConnected().then((connected: boolean) => {
+/**
+ * Retrieve the unit given unit id
+ * @param {Unit} unitId
+ * @returns {Promise<Unit>}
+ */
+export function getUnit(unitId: number) : Promise<Unit> {
+  return isDBConnected().then((connected: boolean) => {
     if (!connected) {
       throw new Error('Database unavailable.');
     }
-    return dbService.getAllUnits();
+    return dbGetUnit(unitId);
+  }).then((unit: Unit) => unit).catch((err) => {
+    throw new Error('An unexpected error has occurs.');
   });
 }
 
 /**
  * Retrieve the unit type of the given unit id
  * @param {Unit} unitId
- * @returns {Unit}
+ * @returns {Promise<UnitType>}
  */
-export function getUnit(unitId: number): Promise<Unit> {
-  return new Promise<Unit>((res) => {
-    res(new Unit(8, 'The 08th MS Team', UnitType.BRIGADE));
+export function getUnitType(unitId: number) : Promise<UnitType> {
+  return isDBConnected().then((connected: boolean) => {
+    if (!connected) {
+      throw new Error('Database unavailable.');
+    }
+    return dbGetUnitType(unitId);
+  }).then((unitType: UnitType) => unitType).catch((err) => {
+    throw new Error('An unexpected error has occurs.');
   });
 }
 
 /**
- * Retrieve the specific parent unit id of the given child unit id
- * @param {number} unitId
- * @param {Unit} parentUnitType
- * @returns {number}
+ * Retrieve all units
+ * @param {Unit} unitId
+ * @returns {Promise<Unit[]>}
  */
-export function getParent(unitId: number, parentUnitType: UnitType): Promise<Unit> {
-  return new Promise<Unit>((res) => {
-    res(new Unit(9, 'The parent unit', parentUnitType));
+export function getAllUnits(): Promise<Unit[]> {
+  return isDBConnected().then((connected: boolean) => {
+    if (!connected) {
+      throw new Error('Database unavailable.');
+    }
+    return dbGetAllUnits();
+  }).then((units: Unit[]) => units).catch((err) => {
+    throw new Error('An unexpected error has occurs.');
   });
 }
 
 /**
- * Retrieve the specific parent unit id of the given child unit id
- * @param {number} unitId
- * @param {Unit} parentUnitType
- * @returns {number}
+ * Retrieve all units of given unit type NOT related to the given unit id
+ * @param {Unit} unitId
+ * @param {UnitType} unitType
+ * @returns {Promise<Unit[]>}
  */
-export function getChildren(unitId: number, childUnitType: UnitType): Promise<Unit[]> {
-  return new Promise<Unit[]>((res) => {
-    const result : Unit[] = [];
-    result.push(new Unit(10, 'The child unit', childUnitType));
-    res(result);
+export function getNegativeRelationship(unitID: number, unitType: UnitType): Promise<Unit[]> {
+  return isDBConnected().then((connected: boolean) => {
+    if (!connected) {
+      throw new Error('Database unavailable.');
+    }
+    return dbGetNegativeRelationship(unitID, unitType);
+  }).then((units: Unit[]) => units).catch((err) => {
+    throw new Error('An unexpected error has occurs.');
   });
 }
 
 /**
- * Retrieve the specific parent unit id of the given child unit id
- * @param {number} unitId
- * @param {Unit} parentUnitType
- * @returns {number}
+ * Retrieve all units of given unit type related to the given unit id
+ * @param {Unit} unitId
+ * @param {UnitType} unitType
+ * @returns {Promise<Unit[]>}
  */
-export function getNotParent(unitId: number, unitType: UnitType): Promise<Unit[]> {
-  return new Promise<Unit[]>((res) => {
-    const result : Unit[] = [];
-    result.push(new Unit(10, 'The not parent unit 1', unitType));
-    result.push(new Unit(11, 'The not parent unit 1', unitType));
-    res(result);
-  });
-}
-
-/**
- * Retrieve the specific parent unit id of the given child unit id
- * @param {number} unitId
- * @param {Unit} parentUnitType
- * @returns {number}
- */
-export function getNotChildren(unitId: number, unitType: UnitType): Promise<Unit[]> {
-  return new Promise<Unit[]>((res) => {
-    setTimeout(() => {
-      const result : Unit[] = [];
-      result.push(new Unit(10, 'The not child unit 1', unitType));
-      result.push(new Unit(11, 'The not child unit 2', unitType));
-      res(result);
-    }, 100);
+export function getRelationship(unitID: number, unitType: UnitType): Promise<Unit[]> {
+  return isDBConnected().then((connected: boolean) => {
+    if (!connected) {
+      throw new Error('Database unavailable.');
+    }
+    return dbGetRelationship(unitID, unitType);
+  }).then((units: Unit[]) => units).catch((err) => {
+    throw new Error('An unexpected error has occurs.');
   });
 }

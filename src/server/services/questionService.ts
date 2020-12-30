@@ -2,15 +2,77 @@
 /* Justification: Those lonely if will be implement later */
 
 import { NOTFOUND, NOTIMP } from 'dns';
-import { Polarity, UnitType } from '../../utils/enums';
+import { Polarity, UnitType, unitTypeToLevel } from '../../utils/enums';
 import {
-  getUnit, getParent, getChildren, getNotChildren,
+  getNegativeRelationship,
+  getRelationship,
+  getUnit,
 } from './dbManager';
-import Question from '../../utils/Question';
-import QuestionTemplate from '../../utils/QuestionTemplate';
 import templates from '../../constants/templates';
-import Unit from '../../utils/Unit';
 import { getMutipleRandomInt, randomIntFromInterval } from '../../utils/commons';
+import { Question, QuestionTemplate, Unit } from '../../utils/apiTypes';
+
+/**
+ * Get a valid token for the given question template
+ * @param {Unit} unit
+ * @param {template} QuestionTemplate
+ * @returns {Promise<Unit>}
+ */
+function getToken(
+  unit: Unit,
+  template: QuestionTemplate,
+): Promise<Unit> {
+  return getRelationship(unit.id, template.token).then((childUnits: Unit[]) => childUnits[randomIntFromInterval(0, childUnits.length)]);
+}
+
+/**
+ * Get a answer based on the given token for the given question template
+ * @param {Unit} unit
+ * @param {template} QuestionTemplate
+ * @returns {Promise<Unit>}
+ */
+function getAnswer(
+  token: Promise<Unit>,
+  template: QuestionTemplate,
+): Promise<Unit> {
+  let answers : Promise<Unit[]>;
+  if (template.polarity === Polarity.POSITIVE) {
+    answers = token.then((unit: Unit) => getRelationship(unit.id, template.answer));
+  } else {
+    answers = token.then((unit: Unit) => getNegativeRelationship(unit.id, template.answer));
+  }
+
+  return answers.then((child: Unit[]) => child[randomIntFromInterval(0, child.length)]);
+}
+
+/**
+ * Get incorrect answers based on the given token for the given question template
+ * @param {Unit} unit
+ * @param {template} QuestionTemplate
+ * @param {number} numberOfChoices
+ * @returns {Promise<Unit>}
+ */
+function getOtherChoices(
+  token: Promise<Unit>,
+  template: QuestionTemplate,
+  numberOfChoices: number,
+): Promise<Unit[]> {
+  let incorrectAnswers : Promise<Unit[]>;
+  if (template.polarity === Polarity.POSITIVE) {
+    incorrectAnswers = token.then((unit: Unit) => getNegativeRelationship(unit.id, template.answer));
+  } else {
+    incorrectAnswers = token.then((unit: Unit) => getRelationship(unit.id, template.answer));
+  }
+
+  return incorrectAnswers.then((tchildUnits: Unit[]) => {
+    const idx = getMutipleRandomInt(0, tchildUnits.length, numberOfChoices);
+    const result: Unit[] = [];
+    for (let i = 0; i < numberOfChoices; i += 1) {
+      result.push(tchildUnits[idx[i]]);
+    }
+    return result;
+  });
+}
 
 /**
  * Generate Question (questions, choices, and answer) from a QuestionTemplate
@@ -26,56 +88,16 @@ function generateQuestionFromTemplate(
     // You can't have a token equal to answer.
     // i.e. The relationship must be on a different level
     throw TypeError;
-  } else if (unit.type < template.token || unit.type < template.answer) {
+  } else if (unitTypeToLevel(unit.unitType)! < unitTypeToLevel(template.token)!
+    || unitTypeToLevel(unit.unitType)! < unitTypeToLevel(template.answer)!) {
     // You can't have unit type smaller than template token or template answer.
     // i.e. The unit must be parent of both token and answer
     throw TypeError;
   }
 
-  let token: Promise<Unit>;
-  let answer: Promise<Unit>;
-  let otherChoices: Promise<Unit[]>;
-  if (template.polarity === Polarity.POSITIVE) {
-    if (template.token > template.answer) {
-      // If token > answer, the answer must reside in the child node of the token
-      token = getChildren(unit.id, template.token).then((childUnits: Unit[]) => childUnits[randomIntFromInterval(0, childUnits.length)]);
-
-      answer = token.then((tokenUnit: Unit) => getChildren(tokenUnit.id, template.answer)).then((tchildUnits: Unit[]) => tchildUnits[randomIntFromInterval(0, tchildUnits.length)]);
-
-      otherChoices = token.then((tokenUnit: Unit) => getNotChildren(tokenUnit.id, template.answer)).then((tchildUnits: Unit[]) => {
-        const idx = getMutipleRandomInt(0, tchildUnits.length, 3);
-        const result: Unit[] = [];
-        for (let i = 0; i < 3; i += 1) {
-          result.push(tchildUnits[idx[i]]);
-        }
-        return result;
-      });
-    } else {
-      // template.token < template.answer
-      throw NOTIMP;
-    }
-  } else {
-    // This template has a negative polarity
-    if (template.token > template.answer) {
-      // If token > answer, the answer must reside in the child node of the token
-      token = getChildren(unit.id, template.token).then((childUnits: Unit[]) => childUnits[randomIntFromInterval(0, childUnits.length)]);
-
-      answer = token.then((tokenUnit: Unit) => getNotChildren(tokenUnit.id, template.answer)).then((tchildUnits: Unit[]) => tchildUnits[randomIntFromInterval(0, tchildUnits.length)]);
-
-      otherChoices = token.then((tokenUnit: Unit) => getChildren(tokenUnit.id, template.answer))
-        .then((tchildUnits: Unit[]) => {
-          const idx = getMutipleRandomInt(0, tchildUnits.length, 3);
-          const result: Unit[] = [];
-          for (let i = 0; i < 3; i += 1) {
-            result.push(tchildUnits[idx[i]]);
-          }
-          return result;
-        });
-    } else {
-      // template.token < template.answer
-      throw NOTIMP;
-    }
-  }
+  const token: Promise<Unit> = getToken(unit, template);
+  const answer: Promise<Unit> = getAnswer(token, template);
+  const otherChoices: Promise<Unit[]> = getOtherChoices(token, template, 3);
 
   const promiseList: [Promise<Unit>, Promise<Unit>, Promise<Unit[]>] = [token, answer, otherChoices];
   return Promise.all(promiseList).then((results) => {
@@ -93,7 +115,11 @@ function generateQuestionFromTemplate(
       }
     }
 
-    return new Question(text, choices, correctIdx);
+    return {
+      question: text,
+      choices,
+      correctChoiceIndex: correctIdx,
+    };
   });
 }
 
@@ -134,7 +160,7 @@ function generateQuestions(
   unit: Unit,
   questionCount: number,
 ): Promise<Question[]> {
-  const validTemplate = getValidQuestionsForUnitTypes(unit.type);
+  const validTemplate = getValidQuestionsForUnitTypes(unit.unitType);
   const questionsAsync: Promise<Question>[] = [];
   for (let i = 0; i < questionCount; i += 1) {
     const idx = randomIntFromInterval(0, validTemplate.length);
@@ -162,22 +188,22 @@ export default function getRandomQuestions(
     if (!unit) {
       // Throw NOTFOUND expection if the unit is not found
       throw NOTFOUND;
-    } else if (unit.type > questionType) {
+    } else if (unitTypeToLevel(unit.unitType) > unitTypeToLevel(questionType)) {
       throw new Error("Unit type can't be higher level than Question type");
     }
 
     // Split it on purpose even through they can be combined for future expansion
     if (questionType === UnitType.BRIGADE) {
-      if (unit.type !== UnitType.BRIGADE) {
-        return getParent(unit.id, UnitType.BRIGADE);
+      if (unit.unitType !== UnitType.BRIGADE) {
+        return getRelationship(unit.id, UnitType.BRIGADE);
       }
-      return new Promise<Unit>((res) => { res(unit); });
+      return new Promise<Unit[]>((res) => { res([unit]); });
     } if (questionType === UnitType.BATTALION) {
-      if (unit.type !== UnitType.BATTALION) {
-        return getParent(unit.id, UnitType.BATTALION);
+      if (unit.unitType !== UnitType.BATTALION) {
+        return getRelationship(unit.id, UnitType.BATTALION);
       }
-      return new Promise<Unit>((res) => { res(unit); });
+      return new Promise<Unit[]>((res) => { res([unit]); });
     }
     throw NOTIMP;
-  }).then((unit: Unit) => generateQuestions(unit, questionCount));
+  }).then((unit: Unit[]) => generateQuestions(unit[0], questionCount));
 }

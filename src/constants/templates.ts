@@ -1,5 +1,5 @@
+import { QuestionTemplate } from '../utils/apiTypes';
 import { Polarity, UnitType } from '../utils/enums';
-import QuestionTemplate from '../utils/QuestionTemplate';
 
 /**
  * List of the questions templates for question generators

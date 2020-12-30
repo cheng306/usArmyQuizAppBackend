@@ -23,7 +23,7 @@ router.get('/questions', (req: Request<unknown, unknown, unknown, GetQuestionsBo
   }
 
   const questions: Question[] = [];
-  if (process.env.USING_MOCK === 'TRUE') {
+  if (JSON.parse(process.env.USING_MOCK!)) {
     for (let i = 0; i < questionCounts; i += 1) {
       questions.push(question);
     }
@@ -31,6 +31,9 @@ router.get('/questions', (req: Request<unknown, unknown, unknown, GetQuestionsBo
     return res.send(questions);
   }
   const type = parseUnitType(questionType)!;
-  return getRandomQuestions(unitId, type, questionCounts).then((randomQuestions: Question[]) => res.send(randomQuestions));
+  return getRandomQuestions(unitId, type, questionCounts).then((randomQuestions: Question[]) => {
+    res.status(200);
+    return res.send(randomQuestions);
+  });
 });
 export default router;
