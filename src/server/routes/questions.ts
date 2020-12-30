@@ -34,6 +34,9 @@ router.get('/questions', (req: Request<unknown, unknown, unknown, GetQuestionsBo
   return getRandomQuestions(unitId, type, questionCounts).then((randomQuestions: Question[]) => {
     res.status(200);
     return res.send(randomQuestions);
+  }).catch((err) => {
+    res.status(404);
+    return res.send({ errorMessage: err.message });
   });
 });
 export default router;
