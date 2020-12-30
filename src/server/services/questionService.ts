@@ -2,21 +2,21 @@
 /* Justification: Those lonely if will be implement later */
 
 import { NOTFOUND, NOTIMP } from 'dns';
-import { Polarity, UnitType, unitTypeToLevel } from '../../utils/enums';
+import { Polarity, UnitType } from '../../utils/enums';
 import {
   getNegativeRelationship,
   getRelationship,
   getUnit,
 } from './dbManager';
 import templates from '../../constants/templates';
-import { getMutipleRandomInt, randomIntFromInterval } from '../../utils/commons';
+import { getMutipleRandomInt, randomIntFromInterval, unitTypeToLevel } from '../../utils/commons';
 import { Question, QuestionTemplate, Unit } from '../../utils/apiTypes';
 import { Console } from 'console';
 
 /**
  * Get a valid token for the given question template
  * @param {Unit} unit
- * @param {template} QuestionTemplate
+ * @param {QuestionTemplate} template
  * @returns {Promise<Unit>}
  */
 function getToken(
@@ -32,8 +32,8 @@ function getToken(
 
 /**
  * Get a answer based on the given token for the given question template
- * @param {Unit} unit
- * @param {template} QuestionTemplate
+ * @param {Promise<Unit>} token
+ * @param {QuestionTemplate} template
  * @returns {Promise<Unit>}
  */
 function getAnswer(
@@ -56,8 +56,8 @@ function getAnswer(
 
 /**
  * Get incorrect answers based on the given token for the given question template
- * @param {Unit} unit
- * @param {template} QuestionTemplate
+ * @param {Promise<Unit>} token
+ * @param {QuestionTemplate} template
  * @param {number} numberOfChoices
  * @returns {Promise<Unit>}
  */
@@ -88,7 +88,7 @@ function getOtherChoices(
 /**
  * Generate Question (questions, choices, and answer) from a QuestionTemplate
  * @param {Unit} unit
- * @param {template} QuestionTemplate
+ * @param {QuestionTemplate} template
  * @returns {Question}
  */
 function generateQuestionFromTemplate(
@@ -99,8 +99,8 @@ function generateQuestionFromTemplate(
     // You can't have a token equal to answer.
     // i.e. The relationship must be on a different level
     throw TypeError;
-  } else if (unitTypeToLevel(unit.unitType)! < unitTypeToLevel(template.token)!
-    || unitTypeToLevel(unit.unitType)! < unitTypeToLevel(template.answer)!) {
+  } else if (unitTypeToLevel(unit.unitType!)! < unitTypeToLevel(template.token)!
+    || unitTypeToLevel(unit.unitType!)! < unitTypeToLevel(template.answer)!) {
     // You can't have unit type smaller than template token or template answer.
     // i.e. The unit must be parent of both token and answer
     throw TypeError;
@@ -173,7 +173,7 @@ function generateQuestions(
   unit: Unit,
   questionCount: number,
 ): Promise<Question[]> {
-  const validTemplate = getValidQuestionsForUnitTypes(unit.unitType);
+  const validTemplate = getValidQuestionsForUnitTypes(unit.unitType!);
   const questionsAsync: Promise<Question>[] = [];
   for (let i = 0; i < questionCount; i += 1) {
     const idx = randomIntFromInterval(0, validTemplate.length-1);
@@ -203,7 +203,7 @@ export default function getRandomQuestions(
     if (!unit) {
       // Throw NOTFOUND expection if the unit is not found
       throw NOTFOUND;
-    } else if (unitTypeToLevel(unit.unitType) > unitTypeToLevel(questionType)) {
+    } else if (unitTypeToLevel(unit.unitType!) > unitTypeToLevel(questionType)) {
       throw new Error("Unit type can't be higher level than Question type");
     }
 

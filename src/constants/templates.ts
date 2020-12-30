@@ -4,8 +4,7 @@ import { Polarity, UnitType } from '../utils/enums';
 /**
  * List of the questions templates for question generators
  */
-let templates : QuestionTemplate[];
-export default templates = [
+const templates: QuestionTemplate[] = [
   {
     id: 0,
     type: UnitType.BATTALION,
@@ -49,6 +48,8 @@ export default templates = [
     },
     */
 ];
+
+export default templates;
 /* Future Questions
     {
         id: 1,

@@ -3,12 +3,15 @@ import { connectionPool, db, sql } from './db';
 import { Unit } from '../../utils/apiTypes';
 
 export function isDBConnected(): Promise<boolean> {
-  return db.then(() => connectionPool.connected).catch((resolve) => false);
+  return db.then(() => {
+    console.log(connectionPool.connected);
+    return connectionPool.connected;
+  }).catch(() => false);
 }
 
 export function getAllUnits(): Promise<Unit[]> {
   const request = new sql.Request(connectionPool);
-  return request.query('select * from DeNormalize')
+  return request.query('select id, name from DeNormalize')
     .then((res) => res.recordset)
     .catch((err) => {
       throw err;

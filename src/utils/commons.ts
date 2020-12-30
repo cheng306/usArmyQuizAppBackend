@@ -1,3 +1,5 @@
+import { UnitType } from './enums';
+
 /**
  * Retrieve a random integer between min and max inclusively
  * @param {number} min
@@ -27,4 +29,26 @@ export function getMutipleRandomInt(
     result.push(randomIntFromInterval(min, max));
   }
   return result;
+}
+
+const unitTypeMap: Map<string, UnitType> = new Map([
+  ['division', UnitType.DIVISION],
+  ['brigade', UnitType.BRIGADE],
+  ['battalion', UnitType.BATTALION],
+  ['company', UnitType.COMPANY],
+]);
+
+export function parseUnitType(unitType: string) : UnitType {
+  return unitTypeMap.get(unitType)!;
+}
+
+const unitTypeLevelMap: Map<UnitType, number> = new Map([
+  [UnitType.DIVISION, 3],
+  [UnitType.BRIGADE, 2],
+  [UnitType.BATTALION, 1],
+  [UnitType.COMPANY, 0],
+]);
+
+export function unitTypeToLevel(unitType: UnitType) : number {
+  return unitTypeLevelMap.get(unitType)!;
 }
