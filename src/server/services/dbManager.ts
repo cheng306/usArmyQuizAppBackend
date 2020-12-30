@@ -9,6 +9,11 @@ import {
   isDBConnected,
 } from '../../database/sqlServer/dbService';
 
+/**
+ * Retrieve the unit given unit id
+ * @param {Unit} unitId
+ * @returns {Promise<Unit>}
+ */
 export function getUnit(unitId: number) : Promise<Unit> {
   return isDBConnected().then((connected: boolean) => {
     if (!connected) {
@@ -20,6 +25,11 @@ export function getUnit(unitId: number) : Promise<Unit> {
   });
 }
 
+/**
+ * Retrieve the unit type of the given unit id
+ * @param {Unit} unitId
+ * @returns {Promise<UnitType>}
+ */
 export function getUnitType(unitId: number) : Promise<UnitType> {
   return isDBConnected().then((connected: boolean) => {
     if (!connected) {
@@ -31,6 +41,11 @@ export function getUnitType(unitId: number) : Promise<UnitType> {
   });
 }
 
+/**
+ * Retrieve all units
+ * @param {Unit} unitId
+ * @returns {Promise<Unit[]>}
+ */
 export function getAllUnits(): Promise<Unit[]> {
   return isDBConnected().then((connected: boolean) => {
     if (!connected) {
@@ -42,6 +57,12 @@ export function getAllUnits(): Promise<Unit[]> {
   });
 }
 
+/**
+ * Retrieve all units of given unit type NOT related to the given unit id
+ * @param {Unit} unitId
+ * @param {UnitType} unitType
+ * @returns {Promise<Unit[]>}
+ */
 export function getNegativeRelationship(unitID: number, unitType: UnitType): Promise<Unit[]> {
   return isDBConnected().then((connected: boolean) => {
     if (!connected) {
@@ -53,6 +74,12 @@ export function getNegativeRelationship(unitID: number, unitType: UnitType): Pro
   });
 }
 
+/**
+ * Retrieve all units of given unit type related to the given unit id
+ * @param {Unit} unitId
+ * @param {UnitType} unitType
+ * @returns {Promise<Unit[]>}
+ */
 export function getRelationship(unitID: number, unitType: UnitType): Promise<Unit[]> {
   return isDBConnected().then((connected: boolean) => {
     if (!connected) {

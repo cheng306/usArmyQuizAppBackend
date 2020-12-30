@@ -8,7 +8,7 @@ export function isDBConnected(): Promise<boolean> {
 
 export function getAllUnits(): Promise<Unit[]> {
   const request = new sql.Request(connectionPool);
-  return request.query('select id, name from DeNormalize')
+  return request.query('select * from DeNormalize')
     .then((res) => res.recordset)
     .catch((err) => {
       throw err;
@@ -17,7 +17,7 @@ export function getAllUnits(): Promise<Unit[]> {
 
 export function getUnit(unitId: number): Promise<Unit> {
   const request = new sql.Request(connectionPool);
-  return request.query(`select id, name from DeNormalize where id = ${unitId} `)
+  return request.query(`select * from DeNormalize where id = ${unitId} `)
     .then((res) => res.recordset[0])
     .catch((err) => {
       throw err;
