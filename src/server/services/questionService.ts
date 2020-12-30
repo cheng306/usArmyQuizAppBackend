@@ -11,7 +11,6 @@ import {
 import templates from '../../constants/templates';
 import { getMutipleRandomInt, randomIntFromInterval, unitTypeToLevel } from '../../utils/commons';
 import { Question, QuestionTemplate, Unit } from '../../utils/apiTypes';
-import { Console } from 'console';
 
 /**
  * Get a valid token for the given question template
@@ -23,11 +22,11 @@ function getToken(
   unit: Unit,
   template: QuestionTemplate,
 ): Promise<Unit> {
-  return getRelationship(unit.id, template.token).then((childUnits: Unit[]) => {
-    return childUnits[randomIntFromInterval(0, childUnits.length-1)];
-  }).catch((err) => {
-    throw new Error('Unable to fetch question token');
-  });
+  return getRelationship(unit.id, template.token)
+    .then((childUnits: Unit[]) => childUnits[randomIntFromInterval(0, childUnits.length - 1)])
+    .catch(() => {
+      throw new Error('Unable to fetch question token');
+    });
 }
 
 /**
@@ -47,11 +46,11 @@ function getAnswer(
     answers = token.then((unit: Unit) => getNegativeRelationship(unit.id, template.answer));
   }
 
-  return answers.then((child: Unit[]) => {
-    return child[randomIntFromInterval(0, child.length-1)]
-  }).catch((err) => {
-    throw new Error('Unable to fetch question answer');
-  });
+  return answers
+    .then((child: Unit[]) => child[randomIntFromInterval(0, child.length - 1)])
+    .catch(() => {
+      throw new Error('Unable to fetch question answer');
+    });
 }
 
 /**
@@ -80,7 +79,7 @@ function getOtherChoices(
       result.push(tchildUnits[idx[i]]);
     }
     return result;
-  }).catch((err) => {
+  }).catch(() => {
     throw new Error('Unable to fetch question choices');
   });
 }
@@ -176,14 +175,16 @@ function generateQuestions(
   const validTemplate = getValidQuestionsForUnitTypes(unit.unitType!);
   const questionsAsync: Promise<Question>[] = [];
   for (let i = 0; i < questionCount; i += 1) {
-    const idx = randomIntFromInterval(0, validTemplate.length-1);
+    const idx = randomIntFromInterval(0, validTemplate.length - 1);
     const template = validTemplate[idx];
     questionsAsync.push(generateQuestionFromTemplate(unit, template));
   }
 
-  return Promise.all(questionsAsync).then((questions: Question[]) => questions).catch((err) => {
-    throw err;
-  });
+  return Promise.all(questionsAsync)
+    .then((questions: Question[]) => questions)
+    .catch((err) => {
+      throw err;
+    });
 }
 
 /**
@@ -220,7 +221,9 @@ export default function getRandomQuestions(
       return new Promise<Unit[]>((res) => { res([unit]); });
     }
     throw NOTIMP;
-  }).then((unit: Unit[]) => generateQuestions(unit[0], questionCount)).catch((err) => {
-    throw err;
-  });
+  })
+    .then((unit: Unit[]) => generateQuestions(unit[0], questionCount))
+    .catch((err) => {
+      throw err;
+    });
 }
