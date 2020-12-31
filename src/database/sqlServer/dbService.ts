@@ -1,13 +1,11 @@
 import { UnitType } from '../../utils/enums';
 import { connectionPool, db, sql } from './db';
 import { Unit } from '../../utils/apiTypes';
-import {parseUnitType} from "../../utils/commons";
+import { parseUnitType } from '../../utils/commons';
 
 export function isDBConnected(): Promise<boolean> {
   return db
-    .then(() => {
-      return connectionPool.connected;
-    })
+    .then(() => connectionPool.connected)
     .catch(() => false);
 }
 
