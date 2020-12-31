@@ -112,11 +112,11 @@ function generateQuestionFromTemplate(
   const promiseList: [Promise<Unit>, Promise<Unit>, Promise<Unit[]>] = [token, answer, otherChoices];
   return Promise.all(promiseList).then((results) => {
     const text: string = template.text.replace(/:TOKEN:/gi, results[0].name);
-    const correctIdx = randomIntFromInterval(0, 2);
+    const correctIdx = randomIntFromInterval(0, 3);
     const choices: string[] = [];
 
     let j = 0;
-    for (let i = 0; i < 3; i += 1) {
+    for (let i = 0; i < 4; i += 1) {
       if (i === correctIdx) {
         choices.push(results[1].name);
       } else {
