@@ -73,7 +73,7 @@ function getOtherChoices(
   }
 
   return incorrectAnswers.then((tchildUnits: Unit[]) => {
-    const idx = getMutipleRandomInt(0, tchildUnits.length, numberOfChoices);
+    const idx = getMutipleRandomInt(0, tchildUnits.length - 1, numberOfChoices);
     const result: Unit[] = [];
     for (let i = 0; i < numberOfChoices; i += 1) {
       result.push(tchildUnits[idx[i]]);

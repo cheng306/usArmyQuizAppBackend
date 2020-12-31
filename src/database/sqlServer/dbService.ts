@@ -1,11 +1,11 @@
 import { UnitType } from '../../utils/enums';
 import { connectionPool, db, sql } from './db';
 import { Unit } from '../../utils/apiTypes';
+import {parseUnitType} from "../../utils/commons";
 
 export function isDBConnected(): Promise<boolean> {
   return db
     .then(() => {
-      console.log(connectionPool.connected);
       return connectionPool.connected;
     })
     .catch(() => false);
@@ -49,9 +49,19 @@ export function getRelationship(unitID: number, unitType: UnitType): Promise<Uni
     where brigadeID = ${unitID}
     or battalionID = ${unitID}
     or divisionID = ${unitID}
-     or companyID = ${unitID} 
+    or companyID = ${unitID} 
   `)
-    .then((res) => res.recordset)
+    .then((res) => {
+      const list: Unit[] = [];
+      res.recordset.forEach((record) => {
+        list.push({
+          unitType: parseUnitType(record.unitType),
+          id: record[sqlUnitType],
+          name: record.name,
+        });
+      });
+      return list;
+    })
     .catch((err) => {
       throw err;
     });
@@ -61,16 +71,26 @@ export function getNegativeRelationship(unitID: number, unitType: UnitType): Pro
   const request = new sql.Request(connectionPool);
   const sqlUnitType = `${unitType}ID`;
   return request.query(`
-  select distinct ${sqlUnitType}, name, unitType
+    select distinct ${sqlUnitType}, name, unitType
     from Company as c
     inner join DeNormalize as dn
     on c.${sqlUnitType} = dn.ID
     where brigadeID != ${unitID}
     and battalionID != ${unitID}
     and divisionID != ${unitID}
-     and companyID != ${unitID} 
-     `)
-    .then((res) => res.recordset)
+    and companyID != ${unitID} 
+  `)
+    .then((res) => {
+      const list: Unit[] = [];
+      res.recordset.forEach((record) => {
+        list.push({
+          unitType: parseUnitType(record.unitType),
+          id: record[sqlUnitType],
+          name: record.name,
+        });
+      });
+      return list;
+    })
     .catch((err) => {
       throw err;
     });
