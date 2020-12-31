@@ -141,13 +141,7 @@ function generateQuestionFromTemplate(
 function getValidQuestionsForUnitTypes(
   questionType: UnitType,
 ): QuestionTemplate[] {
-  const result: QuestionTemplate[] = [];
-  templates.forEach((template) => {
-    if (unitTypeToLevel(template.type) <= unitTypeToLevel(questionType)) {
-      result.push(template);
-    }
-  });
-  return result;
+  return templates.filter((template) => unitTypeToLevel(template.type) <= unitTypeToLevel(questionType));
 }
 
 /**
@@ -191,7 +185,7 @@ export default function getRandomQuestions(
   return getUnit(unitId)
     .then((unit : Unit) => {
       if (!unit) {
-      // Throw NOTFOUND expection if the unit is not found
+      // Throw NOTFOUND exception if the unit is not found
         throw NOTFOUND;
       } else if (unitTypeToLevel(unit.unitType!) > unitTypeToLevel(questionType)) {
         throw new Error("Unit type can't be higher level than Question type");
