@@ -18,10 +18,7 @@ import { Question, QuestionTemplate, Unit } from '../../utils/apiTypes';
  * @param {QuestionTemplate} template
  * @returns {Promise<Unit>}
  */
-function getToken(
-  unit: Unit,
-  template: QuestionTemplate,
-): Promise<Unit> {
+function getToken(unit: Unit, template: QuestionTemplate,): Promise<Unit> {
   return getRelationship(unit.id, template.token)
     .then((childUnits: Unit[]) => childUnits[randomIntFromInterval(0, childUnits.length - 1)])
     .catch(() => {
@@ -35,8 +32,7 @@ function getToken(
  * @param {QuestionTemplate} template
  * @returns {Promise<Unit>}
  */
-function getAnswer(
-  token: Promise<Unit>,
+function getAnswer(token: Promise<Unit>,
   template: QuestionTemplate,
 ): Promise<Unit> {
   let answers : Promise<Unit[]>;
@@ -67,9 +63,11 @@ function getOtherChoices(
 ): Promise<Unit[]> {
   let incorrectAnswers : Promise<Unit[]>;
   if (template.polarity === Polarity.POSITIVE) {
-    incorrectAnswers = token.then((unit: Unit) => getNegativeRelationship(unit.id, template.answer));
+    incorrectAnswers = token
+    .then((unit: Unit) => getNegativeRelationship(unit.id, template.answer));
   } else {
-    incorrectAnswers = token.then((unit: Unit) => getRelationship(unit.id, template.answer));
+    incorrectAnswers = token
+    .then((unit: Unit) => getRelationship(unit.id, template.answer));
   }
 
   return incorrectAnswers.then((tchildUnits: Unit[]) => {
@@ -79,7 +77,8 @@ function getOtherChoices(
       result.push(tchildUnits[idx[i]]);
     }
     return result;
-  }).catch(() => {
+  })
+  .catch(() => {
     throw new Error('Unable to fetch question choices');
   });
 }
@@ -130,8 +129,8 @@ function generateQuestionFromTemplate(
       choices,
       correctChoiceIndex: correctIdx,
     };
-  }).catch((err) => {
-    throw err;
+  }).catch((error) => {
+    throw error;
   });
 }
 
@@ -143,23 +142,13 @@ function generateQuestionFromTemplate(
 function getValidQuestionsForUnitTypes(
   questionType: UnitType,
 ): QuestionTemplate[] {
-  switch (questionType) {
-    case UnitType.BRIGADE: {
-      return templates;
+  const result: QuestionTemplate[] = [];
+  templates.forEach((template) => {
+    if (unitTypeToLevel(template.type) <= unitTypeToLevel(questionType)) {
+      result.push(template);
     }
-    case UnitType.BATTALION: {
-      const result: QuestionTemplate[] = [];
-      templates.forEach((template) => {
-        if (template.type === UnitType.BATTALION) {
-          result.push(template);
-        }
-      });
-      return result;
-    }
-    default: {
-      throw NOTIMP;
-    }
-  }
+  });
+  return result;
 }
 
 /**
@@ -182,8 +171,8 @@ function generateQuestions(
 
   return Promise.all(questionsAsync)
     .then((questions: Question[]) => questions)
-    .catch((err) => {
-      throw err;
+    .catch((error) => {
+      throw error;
     });
 }
 
@@ -200,7 +189,8 @@ export default function getRandomQuestions(
   questionCount: number,
 ): Promise<Question[]> {
   // Determine which questions we can generate
-  return getUnit(unitId).then((unit : Unit) => {
+  return getUnit(unitId)
+  .then((unit : Unit) => {
     if (!unit) {
       // Throw NOTFOUND expection if the unit is not found
       throw NOTFOUND;
@@ -209,21 +199,18 @@ export default function getRandomQuestions(
     }
 
     // Split it on purpose even through they can be combined for future expansion
-    if (questionType === UnitType.BRIGADE) {
-      if (unit.unitType !== UnitType.BRIGADE) {
-        return getRelationship(unit.id, UnitType.BRIGADE);
-      }
-      return new Promise<Unit[]>((res) => { res([unit]); });
-    } if (questionType === UnitType.BATTALION) {
-      if (unit.unitType !== UnitType.BATTALION) {
-        return getRelationship(unit.id, UnitType.BATTALION);
+    if (questionType === UnitType.DIVISION
+      || questionType === UnitType.BRIGADE
+      || questionType === UnitType.BATTALION) {
+      if (unit.unitType !== questionType) {
+        return getRelationship(unit.id, questionType);
       }
       return new Promise<Unit[]>((res) => { res([unit]); });
     }
     throw NOTIMP;
   })
     .then((unit: Unit[]) => generateQuestions(unit[0], questionCount))
-    .catch((err) => {
-      throw err;
+    .catch((error) => {
+      throw error;
     });
 }

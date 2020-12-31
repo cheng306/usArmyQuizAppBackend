@@ -32,9 +32,10 @@ router.get('/questions', (req: Request<unknown, unknown, unknown, GetQuestionsBo
     .then((randomQuestions: Question[]) => {
       res.status(200);
       return res.send(randomQuestions);
-    }).catch((err) => {
+    })
+    .catch((error) => {
       res.status(404);
-      return res.send({ errorMessage: err.message });
+      return res.send({ errorMessage: error.message });
     });
 });
 export default router;

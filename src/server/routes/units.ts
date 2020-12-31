@@ -8,7 +8,7 @@ const router = express.Router();
 router.get('/units', (req: Request, res: Response) => {
   getAllUnits()
     .then((units: Unit[]) => res.status(200).send({ units }))
-    .catch((err) => res.status(404).send({ errorMessage: err.message }));
+    .catch((error) => res.status(404).send({ errorMessage: error.message }));
 });
 
 export default router;
