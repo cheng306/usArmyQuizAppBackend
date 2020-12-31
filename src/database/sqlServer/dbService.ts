@@ -11,10 +11,10 @@ export function isDBConnected(): Promise<boolean> {
 
 export function getAllUnits(): Promise<Unit[]> {
   const request = new sql.Request(connectionPool);
-  return request.query('select id, name from DeNormalize')
+  return request.query('select * from DeNormalize')
     .then((res) => res.recordset)
-    .catch((err) => {
-      throw err;
+    .catch((error) => {
+      throw error;
     });
 }
 
@@ -22,8 +22,8 @@ export function getUnit(unitId: number): Promise<Unit> {
   const request = new sql.Request(connectionPool);
   return request.query(`select * from DeNormalize where id = ${unitId} `)
     .then((res) => res.recordset[0])
-    .catch((err) => {
-      throw err;
+    .catch((error) => {
+      throw error;
     });
 }
 
@@ -31,8 +31,8 @@ export function getUnitType(unitId: number): Promise<UnitType> {
   const request = new sql.Request(connectionPool);
   return request.query(`select unitType from DeNormalize where id  = ${unitId} `)
     .then((res) => res.recordset[0])
-    .catch((err) => {
-      throw err;
+    .catch((error) => {
+      throw error;
     });
 }
 
@@ -60,8 +60,8 @@ export function getRelationship(unitID: number, unitType: UnitType): Promise<Uni
       });
       return list;
     })
-    .catch((err) => {
-      throw err;
+    .catch((error) => {
+      throw error;
     });
 }
 
@@ -89,7 +89,7 @@ export function getNegativeRelationship(unitID: number, unitType: UnitType): Pro
       });
       return list;
     })
-    .catch((err) => {
-      throw err;
+    .catch((error) => {
+      throw error;
     });
 }

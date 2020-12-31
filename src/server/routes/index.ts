@@ -8,8 +8,9 @@ router.get('/', (req: Request, res: Response) => {
   getUnit(90000)
     .then((rs) => {
       console.log(rs);
-    }).catch((err) => {
-      console.log(err);
+    })
+    .catch((error) => {
+      console.log(error);
     });
   isDBConnected()
     .then((dbConnected) => {
