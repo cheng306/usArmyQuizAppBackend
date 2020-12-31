@@ -1,7 +1,8 @@
 import express, { Request, Response } from 'express';
 import { GetQuestionsBody, Question } from '../../utils/apiTypes';
 import question from '../mock/question';
-import { parseUnitType } from '../../utils/enums';
+import { parseUnitType } from '../../utils/commons';
+import getRandomQuestions from '../services/questionService';
 
 const router = express.Router();
 
@@ -13,19 +14,27 @@ router.get('/questions', (req: Request<unknown, unknown, unknown, GetQuestionsBo
     || !parseUnitType(questionType)
     || !Number.isInteger(parseInt(String(questionCounts), 10))
   ) {
-    res.status(404);
-    return res.send({ errorMessage: 'Invalid request query.' });
+    return res.status(404).send({ errorMessage: 'Invalid request query.' });
   }
   if (questionCounts < 0 || questionCounts > 50) {
-    res.status(404);
-    return res.send({ errorMessage: 'questionCounts out of range(0 - 50).' });
+    return res.status(404).send({ errorMessage: 'questionCounts out of range(0 - 50).' });
   }
-  const questions: Question[] = [];
-  for (let i = 0; i < questionCounts; i += 1) {
-    questions.push(question);
-  }
-  res.status(200);
-  return res.send(questions);
-});
 
+  const questions: Question[] = [];
+  if (JSON.parse(process.env.USING_MOCK!)) {
+    for (let i = 0; i < questionCounts; i += 1) {
+      questions.push(question);
+    }
+    return res.status(200).send(questions);
+  }
+  const type = parseUnitType(questionType)!;
+  return getRandomQuestions(unitId, type, questionCounts)
+    .then((randomQuestions: Question[]) => {
+      res.status(200);
+      return res.send(randomQuestions);
+    }).catch((err) => {
+      res.status(404);
+      return res.send({ errorMessage: err.message });
+    });
+});
 export default router;

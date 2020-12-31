@@ -23,6 +23,9 @@ module.exports = {
     '@typescript-eslint',
   ],
   rules: {
+    'max-len': [2, { code: 200, tabWidth: 4, ignoreUrls: true }],
+    'no-console': 'off',
+    '@typescript-eslint/no-non-null-assertion': 'off',
     'react/jsx-filename-extension': [2, { extensions: ['.js', '.jsx', '.ts', '.tsx'] }],
     'no-use-before-define': 'off',
     '@typescript-eslint/no-use-before-define': ['error'],
