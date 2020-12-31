@@ -61,13 +61,13 @@ export function getUnitType(unitId: number) : Promise<UnitType> {
  * Retrieve all units
  * @returns {Promise<Unit[]>}
  */
-export function getAllUnits(): Promise<Unit[]> {
+export function getUnitsWithType(unitTypeSet: Set<UnitType>): Promise<Unit[]> {
   return isDBConnected()
     .then((connected: boolean) => {
       if (!connected) {
         throw new Error('Database unavailable.');
       }
-      return dbService.getAllUnits();
+      return dbService.getUnitsWithType(unitTypeSet);
     })
     .then((units: Unit[]) => units)
     .catch((error) => {

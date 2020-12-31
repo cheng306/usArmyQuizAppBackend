@@ -4,7 +4,7 @@ import app from '../app';
 
 const debug = Debug('usarmyquizappbackend:server');
 
-const port: string = process.env.PORT || '3000';
+const port: string = process.env.PORT || '5000';
 app.set('port', port);
 
 // Create HTTP server.
