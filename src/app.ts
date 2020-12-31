@@ -7,14 +7,19 @@ import unitsRouter from './server/routes/units';
 
 const app = express();
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-  extended: false,
-}));
-app.use(cors({
-  origin: ['https://us-army-quiz.netlify.app', 'http://localhost:3000'],
-  optionsSuccessStatus: 200,
-}));
+app.use(
+  bodyParser.json(),
+  bodyParser.urlencoded({
+    extended: false,
+  }),
+  cors({
+    origin: [
+      'https://umts.netlify.app',
+      'http://localhost:3000',
+    ],
+    optionsSuccessStatus: 200,
+  }),
+);
 
 app.use(
   indexRouter,

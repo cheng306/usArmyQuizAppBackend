@@ -9,9 +9,16 @@ export function isDBConnected(): Promise<boolean> {
     .catch(() => false);
 }
 
-export function getAllUnits(): Promise<Unit[]> {
+export function getUnitsWithType(unitTypeSet: Set<UnitType>): Promise<Unit[]> {
+  let conditional = '';
+  if (unitTypeSet.size > 0) {
+    conditional += ' where';
+    unitTypeSet.forEach((unitType: UnitType) => {
+      conditional += ` unitType = '${unitType}' or`;
+    });
+  }
   const request = new sql.Request(connectionPool);
-  return request.query('select * from DeNormalize')
+  return request.query(`select id, name from DeNormalize${conditional.substr(0, conditional.length - 3)}`)
     .then((res) => res.recordset)
     .catch((error) => {
       throw error;

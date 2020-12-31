@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import { GetQuestionsBody, Question } from '../../utils/apiTypes';
 import question from '../mock/question';
-import { parseUnitType } from '../../utils/commons';
+import { parseUnitType, validInt } from '../../utils/commons';
 import getRandomQuestions from '../services/questionService';
 
 const router = express.Router();
@@ -10,9 +10,9 @@ const router = express.Router();
 router.get('/questions', (req: Request<unknown, unknown, unknown, GetQuestionsBody>, res: Response) => {
   const { unitId, questionType, questionCounts }: GetQuestionsBody = req.query;
   if (
-    !Number.isInteger(parseInt(String(unitId), 10))
+    !validInt(String(unitId))
     || !parseUnitType(questionType)
-    || !Number.isInteger(parseInt(String(questionCounts), 10))
+    || !validInt(String(questionCounts))
   ) {
     return res.status(404).send({ errorMessage: 'Invalid request query.' });
   }
