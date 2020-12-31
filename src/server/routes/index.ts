@@ -11,7 +11,6 @@ router.get('/', (req: Request, res: Response) => {
     })
     .catch((error) => {
       console.log(error);
-      
     });
   isDBConnected()
     .then((dbConnected) => {

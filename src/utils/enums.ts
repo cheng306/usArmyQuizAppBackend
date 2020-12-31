@@ -24,8 +24,7 @@ export function unitTypeToLevel(unitType: UnitType) : number {
 /**
  * Enum of questions polarity
  */
-
- export enum Polarity {
+export enum Polarity {
   POSITIVE,
   NEGATIVE,
 }

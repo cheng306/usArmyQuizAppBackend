@@ -5,10 +5,10 @@ export default {
   }, {
     id: 1,
     name: '411th OD BN',
-  },{
+  }, {
     id: 2,
     name: '814th CSSB',
-  },{
+  }, {
     id: 3,
     name: '96th STB',
   }, {

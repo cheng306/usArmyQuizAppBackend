@@ -91,6 +91,5 @@ export function getNegativeRelationship(unitID: number, unitType: UnitType): Pro
     })
     .catch((error) => {
       throw error;
-      ;
     });
 }
