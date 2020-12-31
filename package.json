@@ -3,13 +3,13 @@
   "version": "0.0.0",
   "license": "MIT",
   "engines": {
-    "node": "12.0.0"
+    "node": "14.15.3"
   },
   "scripts": {
     "build": "tsc && NODE_ENV=production nodemon src/server/server.ts",
-    "start": "tsc && NODE_ENV=development nodemon src/server/server.ts",
+    "start": "tsc && nodemon src/server/server.ts",
     "lint": "eslint . --fix --max-warnings=0",
-    "test": "NODE_ENV=development mocha -r ts-node/register test/**/*.ts"
+    "test": "mocha -r ts-node/register test/**/*.ts"
   },
   "husky": {
     "hooks": {
