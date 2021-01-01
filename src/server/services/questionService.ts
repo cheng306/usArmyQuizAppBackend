@@ -30,7 +30,7 @@ function getToken(unit: Unit, template: QuestionTemplate): Promise<Unit> {
  * @returns {Promise<Unit>}
  */
 function getAnswer(token: Promise<Unit>,
-                   template: QuestionTemplate): Promise<Unit> {
+  template: QuestionTemplate): Promise<Unit> {
   let answers : Promise<Unit[]>;
   if (template.polarity === Polarity.POSITIVE) {
     answers = token.then((unit: Unit) => getRelationship(unit.id, template.answer));
