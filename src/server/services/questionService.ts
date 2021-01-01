@@ -1,6 +1,3 @@
-/* eslint no-lonely-if: 0 */
-/* Justification: Those lonely if will be implement later */
-
 import { NOTFOUND, NOTIMP } from 'dns';
 import { Polarity, UnitType } from '../../utils/enums';
 import {

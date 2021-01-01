@@ -27,6 +27,9 @@ router.get('/questions', (req: Request<unknown, unknown, unknown, GetQuestionsQu
     return res.status(200).send(questions);
   }
   const type = parseUnitType(questionType)!;
+  if (type === undefined) {
+    return res.status(404).send({ errorMessage: 'Invalid unitType.' });
+  }
   return getRandomQuestions(unitId, type, questionCounts)
     .then((randomQuestions: Question[]) => {
       res.status(200);

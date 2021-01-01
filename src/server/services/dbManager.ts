@@ -58,7 +58,8 @@ export function getUnitType(unitId: number) : Promise<UnitType> {
 }
 
 /**
- * Retrieve all units
+ * Retrieve all units with specific types
+ * @param {Unit} unitId
  * @returns {Promise<Unit[]>}
  */
 export function getUnitsWithType(unitTypeSet: Set<UnitType>): Promise<Unit[]> {

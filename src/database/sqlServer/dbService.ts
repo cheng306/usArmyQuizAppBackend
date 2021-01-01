@@ -18,7 +18,7 @@ export function getUnitsWithType(unitTypeSet: Set<UnitType>): Promise<Unit[]> {
     });
   }
   const request = new sql.Request(connectionPool);
-  return request.query(`select id, name from DeNormalize${conditional.substr(0, conditional.length - 3)}`)
+  return request.query(`select * from DeNormalize${conditional.substr(0, conditional.length - 3)}`)
     .then((res) => res.recordset)
     .catch((error) => {
       throw error;
