@@ -48,6 +48,7 @@ router.put('/units', (req: Request<PutUnitsBody>, res: Response) => {
   return renameUnit(unitId, newName)
     .then(() => res.status(200).send({ id: unitId, name: newName }))
     .catch((error) => res.status(404).send({ errorMessage: error.message }));
+
 });
 
 export default router;
