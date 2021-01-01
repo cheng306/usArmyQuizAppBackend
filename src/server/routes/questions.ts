@@ -1,14 +1,13 @@
 import express, { Request, Response } from 'express';
-import { GetQuestionsBody, Question } from '../../utils/apiTypes';
+import { GetQuestionsQuery, Question } from '../../utils/apiTypes';
 import question from '../mock/question';
 import { parseUnitType, validInt } from '../../utils/commons';
 import getRandomQuestions from '../services/questionService';
 
 const router = express.Router();
 
-// GET questions
-router.get('/questions', (req: Request<unknown, unknown, unknown, GetQuestionsBody>, res: Response) => {
-  const { unitId, questionType, questionCounts }: GetQuestionsBody = req.query;
+router.get('/questions', (req: Request<unknown, unknown, unknown, GetQuestionsQuery>, res: Response) => {
+  const { unitId, questionType, questionCounts }: GetQuestionsQuery = req.query;
   if (
     !validInt(String(unitId))
     || !parseUnitType(questionType)
