@@ -78,10 +78,12 @@ export type PostUnitsBody = {
 
 /**
  * Type of the PutUnitsBody
+ * @field {string} unitType - UnitType of new unit
  * @field {number} id - Unique identifier of this unit
  * @field {string} newName - Unit's new name
  */
 export type PutUnitsBody = {
+  unitType: string,
   unitId: number,
   newName: string,
 }
