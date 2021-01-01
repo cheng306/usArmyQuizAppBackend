@@ -1,7 +1,9 @@
 import express, { Request, Response } from 'express';
-import { getUnitsWithType } from '../services/dbManager';
+import { getUnitsWithType, getUnit } from '../services/dbManager';
 import { PostUnitsBody, PutUnitsBody, Unit } from '../../utils/apiTypes';
 import { UnitType } from '../../utils/enums';
+import getChildUnits from '../services/unitServices';
+import { parseUnitType } from '../../utils/commons';
 
 const router = express.Router();
 
@@ -11,16 +13,25 @@ router.get('/units', (req: Request<unknown, unknown, unknown, {id: number | unde
     return getUnitsWithType(new Set([UnitType.BATTALION, UnitType.BRIGADE, UnitType.DIVISION]))
       .then((units: Unit[]) => res.status(200).send({ units }))
       .catch((error) => res.status(404).send({ errorMessage: error.message }));
-  } else {
-    return res.status(200).send({ query: req.query });
   }
+  return getUnit(id)
+    .then((unit: Unit) => res.status(200).send({ unit }))
+    .catch((error) => res.status(404).send({ errorMessage: error.message }));
 });
 
-router.get('/units/:unitType', (req: Request<{unitType:string}, unknown, unknown, {id:number}>, res: Response) => {
+router.get('/units/:unitType', (req: Request<{unitType:string}, unknown, unknown, {parentId:number}>, res: Response) => {
   const { unitType } = req.params;
-  const { id } = req.query;
-  console.log(unitType + id);
-  return res.status(200).send({ params: req.params, query: req.query });
+  const { parentId } = req.query;
+  if (parentId === undefined || unitType === undefined) {
+    return res.status(404).send({ errorMessage: 'Invalid request query.' });
+  }
+  const type = parseUnitType(unitType)!;
+  if (type === undefined) {
+    return res.status(404).send({ errorMessage: 'Invalid unitType.' });
+  }
+  return getChildUnits(parentId, type)
+    .then((units: Unit[]) => res.status(200).send({ units }))
+    .catch((error) => res.status(404).send({ errorMessage: error.message }));
 });
 
 router.post('/units', (req: Request<PostUnitsBody>, res: Response) => {
