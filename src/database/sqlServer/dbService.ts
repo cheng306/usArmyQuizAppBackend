@@ -111,4 +111,5 @@ export function renameUnit(unitId : number, newName: string): Promise<number> {
     .catch((error) => {
       throw error;
     });
+
 }

@@ -23,7 +23,7 @@ module.exports = {
     '@typescript-eslint',
   ],
   rules: {
-    'max-len': ['error', { code: 120 }],
+    'max-len': ['error', { code: 150 }],
     'no-console': 'off',
     '@typescript-eslint/no-non-null-assertion': 'off',
     'react/jsx-filename-extension': [2, { extensions: ['.js', '.jsx', '.ts', '.tsx'] }],
