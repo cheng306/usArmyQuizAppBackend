@@ -123,3 +123,24 @@ export function getRelationship(unitId: number, unitType: UnitType): Promise<Uni
       throw new Error('An unexpected error has occurs.');
     });
 }
+export function renameUnit(unitId: number, newName:string): Promise<boolean> {
+  return isDBConnected()
+    .then((connected: boolean) => {
+      if (!connected) {
+        throw new Error('Database unavailable.');
+      }
+      return dbService.renameUnit(unitId, newName);
+    })
+    .then((success:boolean) => {
+      if(!success ){
+        throw new Error;
+      }
+      return success;
+    })
+    .catch((error) => {
+      if (error.message === 'Database unavailable.') {
+        throw error;
+      }
+      throw new Error('An unexpected error has occurs.');
+    });
+}

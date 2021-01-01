@@ -99,4 +99,20 @@ export function getNegativeRelationship(unitID: number, unitType: UnitType): Pro
     .catch((error) => {
       throw error;
     });
+    
+}
+export function renameUnit(unitId : number, newName: string): Promise<boolean>{
+  const request = new sql.Request(connectionPool);
+  return request.query(`
+    UPDATE DeNormalize
+    SET name = '${newName}'
+    where id = ${unitId}
+  `)
+  .then(() => {
+    return true;
+  })
+  .catch((error) => {
+    throw error;
+  });
+  
 }
