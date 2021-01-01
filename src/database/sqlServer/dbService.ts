@@ -107,9 +107,7 @@ export function renameUnit(unitId : number, newName: string): Promise<number> {
     SET name = '${newName}'
     where id = ${unitId}
   `)
-    .then((res) => {
-      return res.rowsAffected[0];
-    })
+    .then((res) => res.rowsAffected[0])
     .catch((error) => {
       throw error;
     });
