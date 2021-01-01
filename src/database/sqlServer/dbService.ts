@@ -100,3 +100,15 @@ export function getNegativeRelationship(unitID: number, unitType: UnitType): Pro
       throw error;
     });
 }
+export function renameUnit(unitId : number, newName: string): Promise<number> {
+  const request = new sql.Request(connectionPool);
+  return request.query(`
+    UPDATE DeNormalize
+    SET name = '${newName}'
+    where id = ${unitId}
+  `)
+    .then((res) => res.rowsAffected[0])
+    .catch((error) => {
+      throw error;
+    });
+}

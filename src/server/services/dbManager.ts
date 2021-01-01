@@ -124,3 +124,24 @@ export function getRelationship(unitId: number, unitType: UnitType): Promise<Uni
       throw new Error('An unexpected error has occurs.');
     });
 }
+export function renameUnit(unitId: number, newName:string): Promise<boolean> {
+  return isDBConnected()
+    .then((connected: boolean) => {
+      if (!connected) {
+        throw new Error('Database unavailable.');
+      }
+      return dbService.renameUnit(unitId, newName);
+    })
+    .then((rowAffected: number) => {
+      if (rowAffected !== 1) {
+        throw new Error('Unknown unitId.');
+      }
+      return true;
+    })
+    .catch((error) => {
+      if (error.message === 'Database unavailable.' || error.message === 'Unknown unitId.') {
+        throw error;
+      }
+      throw new Error('An unexpected error has occurs.');
+    });
+}
