@@ -52,3 +52,7 @@ const unitTypeLevelMap: Map<UnitType, number> = new Map([
 export function unitTypeToLevel(unitType: UnitType) : number {
   return unitTypeLevelMap.get(unitType)!;
 }
+
+export function validInt(value: string): boolean {
+  return Number.isInteger(parseInt(String(value), 10));
+}

@@ -31,7 +31,7 @@ export type Question = {
 export type Unit = {
   id: number,
   name: string,
-  unitType: UnitType | undefined,
+  unitType: UnitType,
 }
 
 /**
