@@ -4,7 +4,6 @@ import { PostUnitsBody, PutUnitsBody, Unit } from '../../utils/apiTypes';
 import { UnitType } from '../../utils/enums';
 import { validInt } from '../../utils/commons';
 
-
 const router = express.Router();
 
 router.get('/units', (req: Request<unknown, unknown, unknown, {id: number | undefined}>, res: Response) => {
@@ -13,9 +12,8 @@ router.get('/units', (req: Request<unknown, unknown, unknown, {id: number | unde
     return getUnitsWithType(new Set([UnitType.BATTALION, UnitType.BRIGADE, UnitType.DIVISION]))
       .then((units: Unit[]) => res.status(200).send({ units }))
       .catch((error) => res.status(404).send({ errorMessage: error.message }));
-  } else {
-    return res.status(200).send({ query: req.query });
   }
+  return res.status(200).send({ query: req.query });
 });
 
 router.get('/units/:unitType', (req: Request<{unitType:string}, unknown, unknown, {id:number}>, res: Response) => {
@@ -32,13 +30,13 @@ router.post('/units', (req: Request<PostUnitsBody>, res: Response) => {
 });
 
 router.put('/units', (req: Request<PutUnitsBody>, res: Response) => {
-  const {unitId, newName }: PutUnitsBody = req.body;
-  if(!validInt(String(unitId))){
+  const { unitId, newName }: PutUnitsBody = req.body;
+  if (!validInt(String(unitId))) {
     return res.status(404).send({ errorMessage: 'Invalid request body.' });
   }
- return renameUnit(unitId,newName)
- .then(() => res.status(200).send({id:unitId,name:newName}))
-      .catch((error) => res.status(404).send({ errorMessage: error.message }));
+  return renameUnit(unitId, newName)
+    .then(() => res.status(200).send({ id: unitId, name: newName }))
+    .catch((error) => res.status(404).send({ errorMessage: error.message }));
 });
 
 export default router;

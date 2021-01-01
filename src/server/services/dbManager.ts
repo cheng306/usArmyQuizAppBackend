@@ -131,14 +131,14 @@ export function renameUnit(unitId: number, newName:string): Promise<boolean> {
       }
       return dbService.renameUnit(unitId, newName);
     })
-    .then((success:boolean) => {
-      if(!success ){
-        throw new Error;
+    .then((rowAffected: number) => {
+      if (rowAffected !== 1) {
+        throw new Error('Unknown unitId.');
       }
-      return success;
+      return true;
     })
     .catch((error) => {
-      if (error.message === 'Database unavailable.') {
+      if (error.message === 'Database unavailable.' || error.message === 'Unknown unitId.') {
         throw error;
       }
       throw new Error('An unexpected error has occurs.');
