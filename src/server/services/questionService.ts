@@ -30,7 +30,7 @@ function getToken(unit: Unit, template: QuestionTemplate): Promise<Unit> {
  * @returns {Promise<Unit>}
  */
 function getAnswer(token: Promise<Unit>,
-  template: QuestionTemplate): Promise<Unit> {
+                   template: QuestionTemplate): Promise<Unit> {
   let answers : Promise<Unit[]>;
   if (template.polarity === Polarity.POSITIVE) {
     answers = token.then((unit: Unit) => getRelationship(unit.id, template.answer));
@@ -138,13 +138,7 @@ function generateQuestionFromTemplate(
 function getValidQuestionsForUnitTypes(
   questionType: UnitType,
 ): QuestionTemplate[] {
-  const result: QuestionTemplate[] = [];
-  templates.forEach((template) => {
-    if (unitTypeToLevel(template.type) <= unitTypeToLevel(questionType)) {
-      result.push(template);
-    }
-  });
-  return result;
+  return templates.filter((template) => unitTypeToLevel(template.type) <= unitTypeToLevel(questionType));
 }
 
 /**
@@ -188,7 +182,7 @@ export default function getRandomQuestions(
   return getUnit(unitId)
     .then((unit : Unit) => {
       if (!unit) {
-      // Throw NOTFOUND expection if the unit is not found
+        // Throw NOTFOUND exception if the unit is not found
         throw NOTFOUND;
       } else if (unitTypeToLevel(unit.unitType!) > unitTypeToLevel(questionType)) {
         throw new Error("Unit type can't be higher level than Question type");
@@ -196,8 +190,8 @@ export default function getRandomQuestions(
 
       // Split it on purpose even through they can be combined for future expansion
       if (questionType === UnitType.DIVISION
-      || questionType === UnitType.BRIGADE
-      || questionType === UnitType.BATTALION) {
+        || questionType === UnitType.BRIGADE
+        || questionType === UnitType.BATTALION) {
         if (unit.unitType !== questionType) {
           return getRelationship(unit.id, questionType);
         }
