@@ -100,6 +100,7 @@ export function getNegativeRelationship(unitID: number, unitType: UnitType): Pro
       throw error;
     });
 }
+
 export function renameUnit(unitId : number, newName: string): Promise<number> {
   const request = new sql.Request(connectionPool);
   return request.query(`
@@ -111,5 +112,4 @@ export function renameUnit(unitId : number, newName: string): Promise<number> {
     .catch((error) => {
       throw error;
     });
-
 }

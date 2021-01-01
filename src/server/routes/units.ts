@@ -1,9 +1,9 @@
 import express, { Request, Response } from 'express';
-import getChildUnits from '../services/unitServices';
-import { getUnitsWithType, renameUnit, getUnit } from '../services/dbManager';
+import { getUnitsWithType, getUnit, renameUnit } from '../services/dbManager';
 import { PostUnitsBody, PutUnitsBody, Unit } from '../../utils/apiTypes';
 import { UnitType } from '../../utils/enums';
-import { validInt, parseUnitType } from '../../utils/commons';
+import getChildUnits from '../services/unitServices';
+import { parseUnitType, validInt } from '../../utils/commons';
 
 const router = express.Router();
 
@@ -48,7 +48,6 @@ router.put('/units', (req: Request<PutUnitsBody>, res: Response) => {
   return renameUnit(unitId, newName)
     .then(() => res.status(200).send({ id: unitId, name: newName }))
     .catch((error) => res.status(404).send({ errorMessage: error.message }));
-
 });
 
 export default router;

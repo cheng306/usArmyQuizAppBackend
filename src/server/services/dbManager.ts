@@ -124,6 +124,7 @@ export function getRelationship(unitId: number, unitType: UnitType): Promise<Uni
       throw new Error('An unexpected error has occurs.');
     });
 }
+
 export function renameUnit(unitId: number, newName:string): Promise<void> {
   return isDBConnected()
     .then((connected: boolean) => {

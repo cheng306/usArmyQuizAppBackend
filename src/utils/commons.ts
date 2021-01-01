@@ -24,10 +24,16 @@ export function getMutipleRandomInt(
   max: number,
   size: number,
 ): number[] {
-  const result: number[] = [];
-  for (let i = 0; i < size; i += 1) {
-    result.push(randomIntFromInterval(min, max));
+  if (max - min + 1 < size) {
+    throw new Error('Unable to generate an array of unique number using the input range');
   }
+  const mSet = new Set<number>();
+  while (mSet.size < size) {
+    mSet.add(randomIntFromInterval(min, max));
+  }
+
+  const result: number[] = [];
+  mSet.forEach((value1) => result.push(value1));
   return result;
 }
 
