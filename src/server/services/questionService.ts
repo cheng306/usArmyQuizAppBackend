@@ -182,7 +182,7 @@ export default function getRandomQuestions(
   return getUnit(unitId)
     .then((unit : Unit) => {
       if (!unit) {
-      // Throw NOTFOUND exception if the unit is not found
+        // Throw NOTFOUND exception if the unit is not found
         throw NOTFOUND;
       } else if (unitTypeToLevel(unit.unitType!) > unitTypeToLevel(questionType)) {
         throw new Error("Unit type can't be higher level than Question type");
@@ -190,8 +190,8 @@ export default function getRandomQuestions(
 
       // Split it on purpose even through they can be combined for future expansion
       if (questionType === UnitType.DIVISION
-      || questionType === UnitType.BRIGADE
-      || questionType === UnitType.BATTALION) {
+        || questionType === UnitType.BRIGADE
+        || questionType === UnitType.BATTALION) {
         if (unit.unitType !== questionType) {
           return getRelationship(unit.id, questionType);
         }

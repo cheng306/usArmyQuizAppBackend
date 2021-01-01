@@ -1,9 +1,9 @@
 import express, { Request, Response } from 'express';
-import { getUnitsWithType, getUnit } from '../services/dbManager';
+import { getUnitsWithType, getUnit, renameUnit } from '../services/dbManager';
 import { PostUnitsBody, PutUnitsBody, Unit } from '../../utils/apiTypes';
 import { UnitType } from '../../utils/enums';
 import getChildUnits from '../services/unitServices';
-import { parseUnitType } from '../../utils/commons';
+import { parseUnitType, validInt } from '../../utils/commons';
 
 const router = express.Router();
 
@@ -41,9 +41,13 @@ router.post('/units', (req: Request<PostUnitsBody>, res: Response) => {
 });
 
 router.put('/units', (req: Request<PutUnitsBody>, res: Response) => {
-  const { unitType, unitId, newName }: PutUnitsBody = req.body;
-  console.log(unitType + unitId + newName);
-  return res.status(200).send({ body: req.body });
+  const { unitId, newName }: PutUnitsBody = req.body;
+  if (!validInt(String(unitId))) {
+    return res.status(404).send({ errorMessage: 'Invalid request body.' });
+  }
+  return renameUnit(unitId, newName)
+    .then(() => res.status(200).send({ id: unitId, name: newName }))
+    .catch((error) => res.status(404).send({ errorMessage: error.message }));
 });
 
 export default router;
