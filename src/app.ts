@@ -14,7 +14,7 @@ app.use(
   }),
   cors({
     origin: [
-      'https://umts.netlify.app',
+      'https://4umt.netlify.app',
       'http://localhost:3000',
     ],
     optionsSuccessStatus: 200,
