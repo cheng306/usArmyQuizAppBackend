@@ -103,16 +103,14 @@ export function getNegativeRelationship(unitID: number, unitType: UnitType): Pro
 
 export function getUnitstToBeDeleted(unitId: number, unitType: string, arr:string[]): Promise<Unit[]> {
   const request = new sql.Request(connectionPool);
-  return request.query(
-    `
+  return request.query(`
     select distinct id, name, unitType
     from DeNormalize as d
     inner join Company as c
     on d.id = c.companyID or battalionID = id or brigadeID = id or divisionID = id
     where (battalionID = ${unitId} or brigadeID = ${unitId} or divisionID = ${unitId} or companyID = ${unitId})
     and (unitType = '${arr[0]}' or unitType = '${arr[1]}' or unitType = '${arr[2]}' or unitType = '${arr[3]}');
-  `,
-  )
+  `)
     .then((res) => {
       const list: Unit[] = [];
       res.recordset.forEach((record) => {
