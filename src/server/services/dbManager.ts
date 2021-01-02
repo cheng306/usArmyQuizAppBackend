@@ -172,7 +172,7 @@ export function deleteUnit(unitId: number, unitType: string): Promise<boolean> {
         throw error;
       }
       throw new Error('Unable to delete the unit');
-     });
+    });
 }
 
 export function renameUnit(unitId: number, newName:string): Promise<void> {

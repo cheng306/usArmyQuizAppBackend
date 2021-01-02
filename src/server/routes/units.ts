@@ -1,5 +1,7 @@
 import express, { Request, Response } from 'express';
-import { getUnitsWithType, getUnit, renameUnit, deleteUnit} from '../services/dbManager';
+import {
+  getUnitsWithType, getUnit, renameUnit, deleteUnit,
+} from '../services/dbManager';
 import {
   DeleteUnitsBody, PostUnitsBody, PutUnitsBody, Unit,
 } from '../../utils/apiTypes';
@@ -53,14 +55,17 @@ router.put('/units', checkPassword, (req: Request<unknown, unknown, PutUnitsBody
     .catch((error) => res.status(404).send({ errorMessage: error.message }));
 });
 
-router.delete('/units', (req: Request<DeleteUnitsBody>, res: Response) => {
+router.delete('/units', checkPassword, (req: Request<unknown, unknown, DeleteUnitsBody>, res: Response) => {
   const { unitType, unitId }: DeleteUnitsBody = req.body;
-  console.log(unitType + unitId);
-  return deleteUnit(unitId, unitType).then(
-    (success:boolean) => {
-      res.status(200).send({ Success: success });
-    },
-  ).catch((error) => res.status(404).send({ errorMessage: error.message }));
+  if (
+    !validInt(String(unitId))
+    || !parseUnitType(unitType)
+  ) {
+    return res.status(404).send({ errorMessage: 'Invalid request body.' });
+  }
+  return deleteUnit(unitId, parseUnitType(unitType))
+    .then((success: boolean) => res.status(200).send({ Success: success }))
+    .catch((error) => res.status(404).send({ errorMessage: error.message }));
 });
 
 export default router;
