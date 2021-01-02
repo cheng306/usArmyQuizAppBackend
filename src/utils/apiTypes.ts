@@ -87,3 +87,13 @@ export type PutUnitsBody = {
   unitId: number,
   newName: string,
 }
+
+/**
+ * Type of the DeleteUnitsBody
+ * @field {string} unitType - UnitType of unit to be deleted
+ * @field {number} id - Unique identifier of this unit
+ */
+export type DeleteUnitsBody = {
+  unitType: string,
+  unitId: number
+}

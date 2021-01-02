@@ -125,6 +125,56 @@ export function getRelationship(unitId: number, unitType: UnitType): Promise<Uni
     });
 }
 
+/**
+ * Delete the unit of input unitId and all units under that unitId
+ * @param {Unit} unitId
+ * @param {UnitType} unitType
+ * @returns {Promise<boolean>}
+ */
+export function deleteUnit(unitId: number, unitType: string): Promise<boolean> {
+  // let unitsToDelete:Unit[];
+  return isDBConnected()
+    .then(
+      (connected: boolean) => {
+        if (!connected) {
+          throw new Error('Database unavailable.');
+        }
+        let divisionStr = '';
+        let brigadeStr = '';
+        let battalionStr = '';
+        let companyStr = '';
+
+        if (unitType === UnitType.DIVISION) {
+          divisionStr = 'division';
+          brigadeStr = 'brigade';
+          battalionStr = 'battalion';
+        } else if (unitType === UnitType.BRIGADE) {
+          brigadeStr = 'brigade';
+          battalionStr = 'battalion';
+        } else if (unitType === UnitType.BATTALION) {
+          battalionStr = 'battalion';
+        }
+        companyStr = 'company';
+        return dbService.getUnitstToBeDeleted(unitId, unitType, [divisionStr, brigadeStr, battalionStr, companyStr]);
+      },
+    ).then(
+      (units: Unit[]) => {
+        if (units.length === 0) {
+          throw new Error('No units can be deleted');
+        }
+        return dbService.deleteUnits(units);
+      },
+    ).then(
+      (success: boolean) => success,
+    )
+    .catch((error) => {
+      if (error.message === 'Database unavailable.') {
+        throw error;
+      }
+      throw new Error('Unable to delete the unit');
+     });
+}
+
 export function renameUnit(unitId: number, newName:string): Promise<void> {
   return isDBConnected()
     .then((connected: boolean) => {
