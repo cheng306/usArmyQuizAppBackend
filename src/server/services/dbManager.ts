@@ -131,44 +131,38 @@ export function getRelationship(unitId: number, unitType: UnitType): Promise<Uni
  * @param {UnitType} unitType
  * @returns {Promise<boolean>}
  */
-export function deleteUnit(unitId: number, unitType: string): Promise<boolean> {
+export function deleteUnit(unitId: number, unitType: UnitType): Promise<boolean> {
   // let unitsToDelete:Unit[];
   return isDBConnected()
-    .then(
-      (connected: boolean) => {
-        if (!connected) {
-          throw new Error('Database unavailable.');
-        }
-        let divisionStr = '';
-        let brigadeStr = '';
-        let battalionStr = '';
-        let companyStr = '';
+    .then((connected: boolean) => {
+      if (!connected) {
+        throw new Error('Database unavailable.');
+      }
+      let divisionStr = '';
+      let brigadeStr = '';
+      let battalionStr = '';
 
-        if (unitType === UnitType.DIVISION) {
-          divisionStr = 'division';
-          brigadeStr = 'brigade';
-          battalionStr = 'battalion';
-        } else if (unitType === UnitType.BRIGADE) {
-          brigadeStr = 'brigade';
-          battalionStr = 'battalion';
-        } else if (unitType === UnitType.BATTALION) {
-          battalionStr = 'battalion';
-        }
-        companyStr = 'company';
-        return dbService.getUnitstToBeDeleted(unitId, unitType, [divisionStr, brigadeStr, battalionStr, companyStr]);
-      },
-    ).then(
-      (units: Unit[]) => {
-        if (units.length === 0) {
-          throw new Error('No units can be deleted');
-        }
-        return dbService.deleteUnits(units);
-      },
-    ).then(
-      (success: boolean) => success,
-    )
+      if (unitType === UnitType.DIVISION) {
+        divisionStr = 'division';
+        brigadeStr = 'brigade';
+        battalionStr = 'battalion';
+      } else if (unitType === UnitType.BRIGADE) {
+        brigadeStr = 'brigade';
+        battalionStr = 'battalion';
+      } else if (unitType === UnitType.BATTALION) {
+        battalionStr = 'battalion';
+      }
+      return dbService.getUnitstToBeDeleted(unitId, unitType, [divisionStr, brigadeStr, battalionStr, 'company']);
+    })
+    .then((units: Unit[]) => {
+      if (units.length === 0) {
+        throw new Error('No units can be deleted');
+      }
+      return dbService.deleteUnits(units);
+    })
+    .then((success: boolean) => success)
     .catch((error) => {
-      if (error.message === 'Database unavailable.') {
+      if (error.message === 'Database unavailable.' || error.message === 'No units can be deleted') {
         throw error;
       }
       throw new Error('Unable to delete the unit');
