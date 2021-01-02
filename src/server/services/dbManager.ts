@@ -58,7 +58,8 @@ export function getUnitType(unitId: number) : Promise<UnitType> {
 }
 
 /**
- * Retrieve all units
+ * Retrieve all units with specific types
+ * @param {Unit} unitId
  * @returns {Promise<Unit[]>}
  */
 export function getUnitsWithType(unitTypeSet: Set<UnitType>): Promise<Unit[]> {
@@ -171,5 +172,26 @@ export function deleteUnit(unitId: number, unitType: string): Promise<boolean> {
         throw error;
       }
       throw new Error('Unable to delete the unit');
+     });
+}
+
+export function renameUnit(unitId: number, newName:string): Promise<void> {
+  return isDBConnected()
+    .then((connected: boolean) => {
+      if (!connected) {
+        throw new Error('Database unavailable.');
+      }
+      return dbService.renameUnit(unitId, newName);
+    })
+    .then((rowAffected: number) => {
+      if (rowAffected !== 1) {
+        throw new Error('Unknown unitId.');
+      }
+    })
+    .catch((error) => {
+      if (error.message === 'Database unavailable.' || error.message === 'Unknown unitId.') {
+        throw error;
+      }
+      throw new Error('An unexpected error has occurs.');
     });
 }

@@ -18,7 +18,7 @@ export function getUnitsWithType(unitTypeSet: Set<UnitType>): Promise<Unit[]> {
     });
   }
   const request = new sql.Request(connectionPool);
-  return request.query(`select id, name from DeNormalize${conditional.substr(0, conditional.length - 3)}`)
+  return request.query(`select * from DeNormalize${conditional.substr(0, conditional.length - 3)}`)
     .then((res) => res.recordset)
     .catch((error) => {
       throw error;
@@ -144,6 +144,19 @@ export function deleteUnits(units: Unit[]): Promise<boolean> {
   }
   return request.query(sqlQuery)
     .then(() => true)
+    .catch((error) => {
+      throw error;
+    });
+}
+
+export function renameUnit(unitId : number, newName: string): Promise<number> {
+  const request = new sql.Request(connectionPool);
+  return request.query(`
+    UPDATE DeNormalize
+    SET name = '${newName}'
+    where id = ${unitId}
+  `)
+    .then((res) => res.rowsAffected[0])
     .catch((error) => {
       throw error;
     });
