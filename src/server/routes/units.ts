@@ -1,13 +1,26 @@
 import express, { Request, Response } from 'express';
 import {
-  getUnitsWithType, getUnit, renameUnit, deleteUnit, createUnit, getRelationship,
+  getUnitsWithType,
+  getUnit,
+  renameUnit,
+  deleteUnit,
+  createUnit,
+  getRelationship,
 } from '../services/dbManager';
 import {
-  DeleteUnitsBody, GetUnits, PostUnitsBody, PutUnitsBody, Unit,
+  DeleteUnitsBody,
+  GetUnits,
+  PostUnitsBody,
+  PutUnitsBody,
+  Unit,
 } from '../../utils/apiTypes';
 import { UnitType } from '../../utils/enums';
 import {
-  parseUnitType, parseUnitTypeLevel, unitTypeToLevel, validateUnitTypeForPost, validInt,
+  parseUnitType,
+  parseUnitTypeLevel,
+  unitTypeToLevel,
+  validateUnitTypeForPost,
+  validInt,
 } from '../../utils/commons';
 import checkPassword from '../services/authService';
 
@@ -47,18 +60,18 @@ router.post('/units', checkPassword, (req: Request<unknown, unknown, PostUnitsBo
     return res.status(404).send({ errorMessage: 'Invalid request query.' });
   }
 
-  return createUnit(name, divisionId, brigadeId, battalionId, type)
-    .then((unit: Unit) => res.status(200).send({ unit }))
+  return createUnit(name, type, divisionId, brigadeId, battalionId)
+    .then((unit: Unit) => res.status(201).send({ unit }))
     .catch((error) => res.status(404).send({ errorMessage: error.message }));
 });
 
 router.put('/units', checkPassword, (req: Request<unknown, unknown, PutUnitsBody>, res: Response) => {
   const { unitId, newName } = req.body;
-  if (!validInt(String(unitId))) {
+  if (!validInt(String(unitId)) || !newName) {
     return res.status(404).send({ errorMessage: 'Invalid request body.' });
   }
   return renameUnit(unitId, newName)
-    .then(() => res.status(200).send({ id: unitId, name: newName }))
+    .then(() => res.status(201).send({ id: unitId, name: newName }))
     .catch((error) => res.status(404).send({ errorMessage: error.message }));
 });
 
