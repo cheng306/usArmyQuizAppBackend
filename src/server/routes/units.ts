@@ -67,7 +67,7 @@ router.post('/units', checkPassword, (req: Request<unknown, unknown, PostUnitsBo
 
 router.put('/units', checkPassword, (req: Request<unknown, unknown, PutUnitsBody>, res: Response) => {
   const { unitId, newName } = req.body;
-  if (!validInt(String(unitId))) {
+  if (!validInt(String(unitId)) || !newName) {
     return res.status(404).send({ errorMessage: 'Invalid request body.' });
   }
   return renameUnit(unitId, newName)
