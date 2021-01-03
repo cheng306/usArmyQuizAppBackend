@@ -156,8 +156,8 @@ export function createDenormalized(name: string, unitType: UnitType): Promise<nu
     });
 }
 
-export function createUnit(divisionId: number| undefined, brigadeId: number | undefined,
-  battalionId: number | undefined, companyId: number | undefined): Promise<boolean> {
+export function createUnit(divisionId?: number, brigadeId?: number,
+  battalionId?: number, companyId?: number): Promise<boolean> {
   const request = new sql.Request(connectionPool);
   return request.query(`
     insert into Unit (companyID , battalionID, brigadeID, divisionID)

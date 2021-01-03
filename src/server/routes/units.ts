@@ -61,7 +61,7 @@ router.post('/units', checkPassword, (req: Request<unknown, unknown, PostUnitsBo
   }
 
   return createUnit(name, divisionId, brigadeId, battalionId, type)
-    .then((unit: Unit) => res.status(200).send({ unit }))
+    .then((unit: Unit) => res.status(201).send({ unit }))
     .catch((error) => res.status(404).send({ errorMessage: error.message }));
 });
 
@@ -71,7 +71,7 @@ router.put('/units', checkPassword, (req: Request<unknown, unknown, PutUnitsBody
     return res.status(404).send({ errorMessage: 'Invalid request body.' });
   }
   return renameUnit(unitId, newName)
-    .then(() => res.status(200).send({ id: unitId, name: newName }))
+    .then(() => res.status(201).send({ id: unitId, name: newName }))
     .catch((error) => res.status(404).send({ errorMessage: error.message }));
 });
 
