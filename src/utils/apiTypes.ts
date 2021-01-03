@@ -65,6 +65,16 @@ export type GetUnitsChildrenQuery = {
 }
 
 /**
+ * Type of the GetUnits
+ * @field {number} id - unit Id
+ * @field {number} parentId - parent id
+ */
+export type GetUnits = {
+  id: number | undefined;
+  parentId: number | undefined;
+}
+
+/**
  * Type of the PostUnitsBody
  * @field {string} unitType - UnitType of new unit
  * @field {string} unitName - Name of new unit
