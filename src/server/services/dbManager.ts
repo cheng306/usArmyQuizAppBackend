@@ -1,3 +1,4 @@
+import { NOTIMP } from 'dns';
 import { UnitType } from '../../utils/enums';
 import { Unit } from '../../utils/apiTypes';
 import * as dbService from '../../database/sqlServer/dbService';
@@ -177,28 +178,26 @@ export function createUnit(name: string, divisionId: number | undefined, brigade
       if (!connected) {
         throw new Error('Database unavailable.');
       }
-      return dbService.createDeNormalize(name, unitType);
+      return dbService.createDenormalized(name, unitType);
     })
-    .then((ID: number) => {
-      id = ID;
-      let companyId: number | undefined = -1;
-      if (unitType === UnitType.COMPANY) {
-        companyId = ID;
-      } else if (unitType === UnitType.DIVISION) {
-        divisionId = ID;
-      } else if (unitType === UnitType.BRIGADE) {
-        brigadeId = ID;
-      } else {
-        battalionId = ID;
+    .then((mId: number) => {
+      id = mId;
+      switch (unitType) {
+        case UnitType.COMPANY:
+          return dbService.createUnit(divisionId, brigadeId, battalionId, id);
+        case UnitType.BATTALION:
+          return dbService.createUnit(divisionId, brigadeId, id, undefined);
+        case UnitType.BRIGADE:
+          return dbService.createUnit(divisionId, id, undefined, undefined);
+        case UnitType.DIVISION:
+          return dbService.createUnit(id, undefined, undefined, undefined);
+        default:
+          throw NOTIMP;
       }
-      return dbService.createCompany(divisionId as number, brigadeId, battalionId, companyId);
     })
     .then(() => ({ id, unitType, name }))
     .catch((error) => {
-      if (error.message === 'Database unavailable.' || error.message === 'row already existed') {
-        throw error;
-      }
-      throw new Error('An unexpected error has occurs.');
+      throw error;
     });
 }
 

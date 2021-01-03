@@ -83,6 +83,7 @@ export type GetUnits = {
  */
 export type PostUnitsBody = {
   name: string,
+  unitType: UnitType,
   divisionId: number | undefined,
   brigadeId: number | undefined,
   battalionId: number | undefined

@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import {
-  getUnitsWithType, getUnit, renameUnit, deleteUnit,
+  getUnitsWithType, getUnit, renameUnit, deleteUnit, createUnit,
 } from '../services/dbManager';
 import {
   DeleteUnitsBody, GetUnits, PostUnitsBody, PutUnitsBody, Unit,
@@ -32,12 +32,17 @@ router.get('/units', (req: Request<unknown, unknown, unknown, GetUnits>, res: Re
     .catch((error) => res.status(404).send({ errorMessage: error.message }));
 });
 
-router.post('/units/:unitType', (req: Request<{unitType:string}, unknown, PostUnitsBody>, res: Response) => {
-  const { unitType } = req.params;
+router.post('/units', (req: Request<unknown, unknown, PostUnitsBody>, res: Response) => {
   const {
-    name, divisionId, brigadeId, battalionId,
+    name, unitType, divisionId, brigadeId, battalionId,
   } = req.body;
-  return res.status(200).send({ body: req.body });
+
+  const type = parseUnitType(unitType);
+  if (!type) return res.status(404).send({ errorMessage: 'Invalid request query.' });
+
+  return createUnit(name, divisionId, brigadeId, battalionId, type)
+    .then((unit: Unit) => res.status(200).send({ unit }))
+    .catch((error) => res.status(404).send({ errorMessage: error.message }));
 });
 
 router.put('/units', checkPassword, (req: Request<unknown, unknown, PutUnitsBody>, res: Response) => {

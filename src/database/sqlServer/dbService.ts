@@ -50,7 +50,7 @@ export function getRelationship(unitID: number, unitType: UnitType): Promise<Uni
     select distinct ${sqlUnitType}, name, unitType
     from Unit as c
     inner join Denormalized as dn
-    on c.${sqlUnitType} = dn.ID
+    on c.${sqlUnitType} = dn.id
     where brigadeID = ${unitID}
     or battalionID = ${unitID}
     or divisionID = ${unitID}
@@ -79,7 +79,7 @@ export function getNegativeRelationship(unitID: number, unitType: UnitType): Pro
     select distinct ${sqlUnitType}, name, unitType
     from Unit as c
     inner join Denormalized as dn
-    on c.${sqlUnitType} = dn.ID
+    on c.${sqlUnitType} = dn.id
     where brigadeID != ${unitID}
     and battalionID != ${unitID}
     and divisionID != ${unitID}
@@ -147,25 +147,27 @@ export function deleteUnits(units: Unit[]): Promise<boolean> {
     });
 }
 
-export function createDeNormalize(unitType: string, name: string): Promise<number> {
+export function createDenormalized(name: string, unitType: UnitType): Promise<number> {
   const request = new sql.Request(connectionPool);
   return request.query(`
-    insert into DeNormalize (name , unitType)
-    output Inserted.ID
-    values (${name}, ${unitType});`)
-    .then((res) => res.recordset[0])
+    insert into Denormalized (name , unitType)
+    output Inserted.id
+    values ('${name}', '${unitType}');`)
+    .then((res) => res.recordset[0].id)
     .catch((error) => {
       throw error;
     });
 }
 
-export function createCompany(divisionId: number, brigadeId: number | undefined,
+export function createUnit(divisionId: number| undefined, brigadeId: number | undefined,
   battalionId: number | undefined, companyId: number | undefined): Promise<boolean> {
   const request = new sql.Request(connectionPool);
-  return request.query(`
-    insert into Company (companyID , battalionID, brigadeID, divisionID)
-    values (${companyId || 'NULL'}, ${battalionId || 'NULL'}
-    , ${brigadeId || 'NULL'}, ${divisionId} );`)
+  const query = `
+  insert into Unit (companyID , battalionID, brigadeID, divisionID)
+  values (${companyId || null}, ${battalionId || null}
+  , ${brigadeId || null}, ${divisionId} );`;
+
+  return request.query(query)
     .then(() => true)
     .catch((error) => {
       throw error;
