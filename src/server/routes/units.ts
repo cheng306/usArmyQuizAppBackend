@@ -1,13 +1,14 @@
 import express, { Request, Response } from 'express';
 import {
-  getUnitsWithType, getUnit, renameUnit, deleteUnit, createUnit,
+  getUnitsWithType, getUnit, renameUnit, deleteUnit, createUnit, getRelationship,
 } from '../services/dbManager';
 import {
   DeleteUnitsBody, GetUnits, PostUnitsBody, PutUnitsBody, Unit,
 } from '../../utils/apiTypes';
 import { UnitType } from '../../utils/enums';
-import getChildUnits from '../services/unitServices';
-import { parseUnitType, validInt } from '../../utils/commons';
+import {
+  parseUnitType, parseUnitTypeLevel, unitTypeToLevel, validateUnitTypeForPost, validInt,
+} from '../../utils/commons';
 import checkPassword from '../services/authService';
 
 const router = express.Router();
@@ -23,7 +24,10 @@ router.get('/units', (req: Request<unknown, unknown, unknown, GetUnits>, res: Re
     if (query.parentId < 0) {
       unitsPromise = getUnitsWithType(new Set([UnitType.DIVISION]));
     } else {
-      unitsPromise = getChildUnits(query.parentId);
+      unitsPromise = getUnit(query.parentId)
+        .then((parent: Unit) => getRelationship(parent.id, parseUnitTypeLevel(unitTypeToLevel(parent.unitType) - 1))).catch((error: Error) => {
+          throw error;
+        });
     }
   } else {
     unitsPromise = new Promise<Unit[]>(() => { throw new Error('Invalid Request.'); });
@@ -38,7 +42,10 @@ router.post('/units', (req: Request<unknown, unknown, PostUnitsBody>, res: Respo
   } = req.body;
 
   const type = parseUnitType(unitType);
-  if (!type) return res.status(404).send({ errorMessage: 'Invalid request query.' });
+  if (!type
+    || !validateUnitTypeForPost(unitType, divisionId, brigadeId, battalionId)) { 
+      return res.status(404).send({ errorMessage: 'Invalid request query.' }); 
+    }
 
   return createUnit(name, divisionId, brigadeId, battalionId, type)
     .then((unit: Unit) => res.status(200).send({ unit }))
@@ -55,7 +62,7 @@ router.put('/units', checkPassword, (req: Request<unknown, unknown, PutUnitsBody
     .catch((error) => res.status(404).send({ errorMessage: error.message }));
 });
 
-router.delete('/units', checkPassword, (req: Request<unknown, unknown, DeleteUnitsBody>, res: Response) => {
+router.delete('/units', (req: Request<unknown, unknown, DeleteUnitsBody>, res: Response) => {
   const { unitType, unitId }: DeleteUnitsBody = req.body;
   if (
     !validInt(String(unitId))

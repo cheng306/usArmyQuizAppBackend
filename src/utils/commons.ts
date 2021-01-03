@@ -71,3 +71,23 @@ export function parseUnitTypeLevel(level: number) : UnitType {
 export function validInt(value: string): boolean {
   return Number.isInteger(parseInt(String(value), 10));
 }
+
+export function validateUnitTypeForPost(unitType : UnitType, divisionId : number|undefined,
+  brigadeId : number|undefined, battalionId: number|undefined) : boolean {
+  switch (unitType) {
+    case UnitType.COMPANY:
+      if (divisionId !== undefined && brigadeId !== undefined && battalionId !== undefined) return true;
+      break;
+    case UnitType.BATTALION:
+      if (divisionId !== undefined && brigadeId !== undefined) return true;
+      break;
+    case UnitType.BRIGADE:
+      if (divisionId !== undefined) return true;
+      break;
+    case UnitType.DIVISION:
+      return true;
+    default:
+      return false;
+  }
+  return false;
+}

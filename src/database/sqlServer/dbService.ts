@@ -127,18 +127,15 @@ export function getUnitstToBeDeleted(unitId: number, unitType: string, arr:strin
     });
 }
 
-export function deleteUnits(units: Unit[]): Promise<boolean> {
+export function deleteUnits(unitId: number, unitType: UnitType, child: Unit[]): Promise<boolean> {
   const request = new sql.Request(connectionPool);
-  let sqlQuery = 'delete from Unit where ';
-  sqlQuery += `divisionID = ${units[0].id} or brigadeID = ${units[0].id} or battalionID = ${units[0].id} or companyID = ${units[0].id}`;
-  for (let i = 1; i < units.length; i += 1) {
-    sqlQuery += `or divisionID = ${units[i].id} or brigadeID = ${units[i].id} or battalionID = ${units[i].id} or companyID = ${units[i].id}`;
-  }
+  const sqlUnitType = `${unitType}ID`;
+  let sqlQuery = `delete from Unit where ${sqlUnitType} = ${unitId}`;
   sqlQuery += '\n';
   sqlQuery += 'delete from Denormalized where ';
-  sqlQuery += `id = ${units[0].id}`;
-  for (let i = 1; i < units.length; i += 1) {
-    sqlQuery += ` or id = ${units[i].id}`;
+  sqlQuery += `id = ${child[0].id}`;
+  for (let i = 1; i < child.length; i += 1) {
+    sqlQuery += ` or id = ${child[i].id}`;
   }
   return request.query(sqlQuery)
     .then(() => true)
