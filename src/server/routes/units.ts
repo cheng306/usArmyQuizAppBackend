@@ -39,9 +39,11 @@ router.get('/units/:unitType', (req: Request<{unitType:string}, unknown, unknown
     .catch((error) => res.status(404).send({ errorMessage: error.message }));
 });
 
-router.post('/units', (req: Request<unknown, unknown, PostUnitsBody>, res: Response) => {
-  const { unitName, unitType, parentId } = req.body;
-  console.log(unitType + unitName + parentId);
+router.post('/units/:unitType', (req: Request<{unitType:string}, unknown, PostUnitsBody>, res: Response) => {
+  const { unitType } = req.params;
+  const {
+    name, divisionId, brigadeId, battalionId,
+  } = req.body;
   return res.status(200).send({ body: req.body });
 });
 

@@ -66,14 +66,16 @@ export type GetUnitsChildrenQuery = {
 
 /**
  * Type of the PostUnitsBody
- * @field {string} unitType - UnitType of new unit
- * @field {string} unitName - Name of new unit
- * @field {number} unitName - New unit's parent's unique identifier
+ * @field {string} name - name of the new unit
+ * @field {number} divisionID - divisionID of the new unit
+ * @field {number} brigadeID - birgadeID of the new unit
+ * @field {number} battalionID - battalionID of the new unit
  */
 export type PostUnitsBody = {
-  unitType: string,
-  unitName: string,
-  parentId: number,
+  name: string,
+  divisionId: number | undefined,
+  brigadeId: number | undefined,
+  battalionId: number | undefined
 }
 
 /**

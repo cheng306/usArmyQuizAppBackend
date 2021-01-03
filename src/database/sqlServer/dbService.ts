@@ -54,7 +54,7 @@ export function getRelationship(unitID: number, unitType: UnitType): Promise<Uni
     where brigadeID = ${unitID}
     or battalionID = ${unitID}
     or divisionID = ${unitID}
-    or companyID = ${unitID} 
+    or companyID = ${unitID}
   `)
     .then((res) => {
       const list: Unit[] = [];
@@ -83,7 +83,7 @@ export function getNegativeRelationship(unitID: number, unitType: UnitType): Pro
     where brigadeID != ${unitID}
     and battalionID != ${unitID}
     and divisionID != ${unitID}
-    and companyID != ${unitID} 
+    and companyID != ${unitID}
   `)
     .then((res) => {
       const list: Unit[] = [];
@@ -141,6 +141,31 @@ export function deleteUnits(units: Unit[]): Promise<boolean> {
     sqlQuery += ` or id = ${units[i].id}`;
   }
   return request.query(sqlQuery)
+    .then(() => true)
+    .catch((error) => {
+      throw error;
+    });
+}
+
+export function createDeNormalize(unitType: string, name: string): Promise<number> {
+  const request = new sql.Request(connectionPool);
+  return request.query(`
+    insert into DeNormalize (name , unitType)
+    output Inserted.ID
+    values (${name}, ${unitType});`)
+    .then((res) => res.recordset[0])
+    .catch((error) => {
+      throw error;
+    });
+}
+
+export function createCompany(divisionId: number, brigadeId: number | undefined,
+  battalionId: number | undefined, companyId: number | undefined): Promise<boolean> {
+  const request = new sql.Request(connectionPool);
+  return request.query(`
+    insert into Company (companyID , battalionID, brigadeID, divisionID)
+    values (${companyId || 'NULL'}, ${battalionId || 'NULL'}
+    , ${brigadeId || 'NULL'}, ${divisionId} );`)
     .then(() => true)
     .catch((error) => {
       throw error;

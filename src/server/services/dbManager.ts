@@ -169,6 +169,39 @@ export function deleteUnit(unitId: number, unitType: UnitType): Promise<boolean>
     });
 }
 
+export function createUnit(name: string, divisionId: number | undefined, brigadeId: number | undefined,
+  battalionId: number | undefined, unitType: UnitType): Promise<Unit> {
+  let id = 0;
+  return isDBConnected()
+    .then((connected: boolean) => {
+      if (!connected) {
+        throw new Error('Database unavailable.');
+      }
+      return dbService.createDeNormalize(name, unitType);
+    })
+    .then((ID: number) => {
+      id = ID;
+      let companyId: number | undefined = -1;
+      if (unitType === UnitType.COMPANY) {
+        companyId = ID;
+      } else if (unitType === UnitType.DIVISION) {
+        divisionId = ID;
+      } else if (unitType === UnitType.BRIGADE) {
+        brigadeId = ID;
+      } else {
+        battalionId = ID;
+      }
+      return dbService.createCompany(divisionId as number, brigadeId, battalionId, companyId);
+    })
+    .then(() => ({ id, unitType, name }))
+    .catch((error) => {
+      if (error.message === 'Database unavailable.' || error.message === 'row already existed') {
+        throw error;
+      }
+      throw new Error('An unexpected error has occurs.');
+    });
+}
+
 export function renameUnit(unitId: number, newName:string): Promise<void> {
   return isDBConnected()
     .then((connected: boolean) => {

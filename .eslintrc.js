@@ -23,6 +23,8 @@ module.exports = {
     '@typescript-eslint',
   ],
   rules: {
+    "rules": {
+      'no-param-reassign': 0,
     'max-len': ['error', { code: 150 }],
     'no-console': 'off',
     '@typescript-eslint/no-non-null-assertion': 'off',
