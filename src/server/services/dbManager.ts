@@ -159,7 +159,7 @@ export function deleteUnit(unitId: number, unitType: UnitType): Promise<boolean>
       if (units.length === 0) {
         throw new Error('No units can be deleted');
       }
-      return dbService.deleteUnits(units);
+      return dbService.deleteUnits(unitId, unitType, units);
     })
     .then((success: boolean) => success)
     .catch((error) => {
