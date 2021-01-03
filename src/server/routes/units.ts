@@ -36,16 +36,16 @@ router.get('/units', (req: Request<unknown, unknown, unknown, GetUnits>, res: Re
     .catch((error) => res.status(404).send({ errorMessage: error.message }));
 });
 
-router.post('/units', (req: Request<unknown, unknown, PostUnitsBody>, res: Response) => {
+router.post('/units', checkPassword, (req: Request<unknown, unknown, PostUnitsBody>, res: Response) => {
   const {
     name, unitType, divisionId, brigadeId, battalionId,
   } = req.body;
 
   const type = parseUnitType(unitType);
   if (!type
-    || !validateUnitTypeForPost(unitType, divisionId, brigadeId, battalionId)) { 
-      return res.status(404).send({ errorMessage: 'Invalid request query.' }); 
-    }
+    || !validateUnitTypeForPost(unitType, divisionId, brigadeId, battalionId)) {
+    return res.status(404).send({ errorMessage: 'Invalid request query.' });
+  }
 
   return createUnit(name, divisionId, brigadeId, battalionId, type)
     .then((unit: Unit) => res.status(200).send({ unit }))
@@ -62,7 +62,7 @@ router.put('/units', checkPassword, (req: Request<unknown, unknown, PutUnitsBody
     .catch((error) => res.status(404).send({ errorMessage: error.message }));
 });
 
-router.delete('/units', (req: Request<unknown, unknown, DeleteUnitsBody>, res: Response) => {
+router.delete('/units', checkPassword, (req: Request<unknown, unknown, DeleteUnitsBody>, res: Response) => {
   const { unitType, unitId }: DeleteUnitsBody = req.body;
   if (
     !validInt(String(unitId))
