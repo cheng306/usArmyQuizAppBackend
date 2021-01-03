@@ -18,7 +18,7 @@ export function getUnitsWithType(unitTypeSet: Set<UnitType>): Promise<Unit[]> {
     });
   }
   const request = new sql.Request(connectionPool);
-  return request.query(`select * from DeNormalize${conditional.substr(0, conditional.length - 3)}`)
+  return request.query(`select * from Denormalized${conditional.substr(0, conditional.length - 3)}`)
     .then((res) => res.recordset)
     .catch((error) => {
       throw error;
@@ -27,7 +27,7 @@ export function getUnitsWithType(unitTypeSet: Set<UnitType>): Promise<Unit[]> {
 
 export function getUnit(unitId: number): Promise<Unit> {
   const request = new sql.Request(connectionPool);
-  return request.query(`select * from DeNormalize where id = ${unitId} `)
+  return request.query(`select * from Denormalized where id = ${unitId} `)
     .then((res) => res.recordset[0])
     .catch((error) => {
       throw error;
@@ -36,7 +36,7 @@ export function getUnit(unitId: number): Promise<Unit> {
 
 export function getUnitType(unitId: number): Promise<UnitType> {
   const request = new sql.Request(connectionPool);
-  return request.query(`select unitType from DeNormalize where id  = ${unitId} `)
+  return request.query(`select unitType from Denormalized where id  = ${unitId} `)
     .then((res) => res.recordset[0])
     .catch((error) => {
       throw error;
@@ -48,8 +48,8 @@ export function getRelationship(unitID: number, unitType: UnitType): Promise<Uni
   const sqlUnitType = `${unitType}ID`;
   return request.query(`
     select distinct ${sqlUnitType}, name, unitType
-    from Company as c
-    inner join DeNormalize as dn
+    from Unit as c
+    inner join Denormalized as dn
     on c.${sqlUnitType} = dn.ID
     where brigadeID = ${unitID}
     or battalionID = ${unitID}
@@ -77,8 +77,8 @@ export function getNegativeRelationship(unitID: number, unitType: UnitType): Pro
   const sqlUnitType = `${unitType}ID`;
   return request.query(`
     select distinct ${sqlUnitType}, name, unitType
-    from Company as c
-    inner join DeNormalize as dn
+    from Unit as c
+    inner join Denormalized as dn
     on c.${sqlUnitType} = dn.ID
     where brigadeID != ${unitID}
     and battalionID != ${unitID}
@@ -105,8 +105,8 @@ export function getUnitstToBeDeleted(unitId: number, unitType: string, arr:strin
   const request = new sql.Request(connectionPool);
   return request.query(`
     select distinct id, name, unitType
-    from DeNormalize as d
-    inner join Company as c
+    from Denormalized as d
+    inner join Unit as c
     on d.id = c.companyID or battalionID = id or brigadeID = id or divisionID = id
     where (battalionID = ${unitId} or brigadeID = ${unitId} or divisionID = ${unitId} or companyID = ${unitId})
     and (unitType = '${arr[0]}' or unitType = '${arr[1]}' or unitType = '${arr[2]}' or unitType = '${arr[3]}');
@@ -129,13 +129,13 @@ export function getUnitstToBeDeleted(unitId: number, unitType: string, arr:strin
 
 export function deleteUnits(units: Unit[]): Promise<boolean> {
   const request = new sql.Request(connectionPool);
-  let sqlQuery = 'delete from Company where ';
+  let sqlQuery = 'delete from Unit where ';
   sqlQuery += `divisionID = ${units[0].id} or brigadeID = ${units[0].id} or battalionID = ${units[0].id} or companyID = ${units[0].id}`;
   for (let i = 1; i < units.length; i += 1) {
     sqlQuery += `or divisionID = ${units[i].id} or brigadeID = ${units[i].id} or battalionID = ${units[i].id} or companyID = ${units[i].id}`;
   }
   sqlQuery += '\n';
-  sqlQuery += 'delete from DeNormalize where ';
+  sqlQuery += 'delete from Denormalized where ';
   sqlQuery += `id = ${units[0].id}`;
   for (let i = 1; i < units.length; i += 1) {
     sqlQuery += ` or id = ${units[i].id}`;
@@ -175,7 +175,7 @@ export function createCompany(divisionId: number, brigadeId: number | undefined,
 export function renameUnit(unitId : number, newName: string): Promise<number> {
   const request = new sql.Request(connectionPool);
   return request.query(`
-    UPDATE DeNormalize
+    UPDATE Denormalized
     SET name = '${newName}'
     where id = ${unitId}
   `)
