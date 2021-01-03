@@ -50,11 +50,11 @@ export function getRelationship(unitID: number, unitType: UnitType): Promise<Uni
     select distinct ${sqlUnitType}, name, unitType
     from Unit as c
     inner join Denormalized as dn
-    on c.${sqlUnitType} = dn.ID
+    on c.${sqlUnitType} = dn.id
     where brigadeID = ${unitID}
     or battalionID = ${unitID}
     or divisionID = ${unitID}
-    or companyID = ${unitID} 
+    or companyID = ${unitID}
   `)
     .then((res) => {
       const list: Unit[] = [];
@@ -79,11 +79,11 @@ export function getNegativeRelationship(unitID: number, unitType: UnitType): Pro
     select distinct ${sqlUnitType}, name, unitType
     from Unit as c
     inner join Denormalized as dn
-    on c.${sqlUnitType} = dn.ID
+    on c.${sqlUnitType} = dn.id
     where brigadeID != ${unitID}
     and battalionID != ${unitID}
     and divisionID != ${unitID}
-    and companyID != ${unitID} 
+    and companyID != ${unitID}
   `)
     .then((res) => {
       const list: Unit[] = [];
@@ -141,6 +141,33 @@ export function deleteUnits(units: Unit[]): Promise<boolean> {
     sqlQuery += ` or id = ${units[i].id}`;
   }
   return request.query(sqlQuery)
+    .then(() => true)
+    .catch((error) => {
+      throw error;
+    });
+}
+
+export function createDenormalized(name: string, unitType: UnitType): Promise<number> {
+  const request = new sql.Request(connectionPool);
+  return request.query(`
+    insert into Denormalized (name , unitType)
+    output Inserted.id
+    values ('${name}', '${unitType}');`)
+    .then((res) => res.recordset[0].id)
+    .catch((error) => {
+      throw error;
+    });
+}
+
+export function createUnit(divisionId: number| undefined, brigadeId: number | undefined,
+  battalionId: number | undefined, companyId: number | undefined): Promise<boolean> {
+  const request = new sql.Request(connectionPool);
+  const query = `
+  insert into Unit (companyID , battalionID, brigadeID, divisionID)
+  values (${companyId || null}, ${battalionId || null}
+  , ${brigadeId || null}, ${divisionId} );`;
+
+  return request.query(query)
     .then(() => true)
     .catch((error) => {
       throw error;
