@@ -1,3 +1,4 @@
+import { NOTIMP } from 'dns';
 import { UnitType } from '../../utils/enums';
 import { Unit } from '../../utils/apiTypes';
 import * as dbService from '../../database/sqlServer/dbService';
@@ -158,7 +159,7 @@ export function deleteUnit(unitId: number, unitType: UnitType): Promise<boolean>
       if (units.length === 0) {
         throw new Error('No units can be deleted');
       }
-      return dbService.deleteUnits(units);
+      return dbService.deleteUnits(unitId, unitType, units);
     })
     .then((success: boolean) => success)
     .catch((error) => {
@@ -166,6 +167,37 @@ export function deleteUnit(unitId: number, unitType: UnitType): Promise<boolean>
         throw error;
       }
       throw new Error('Unable to delete the unit');
+    });
+}
+
+export function createUnit(name: string, divisionId: number | undefined, brigadeId: number | undefined,
+  battalionId: number | undefined, unitType: UnitType): Promise<Unit> {
+  let id = 0;
+  return isDBConnected()
+    .then((connected: boolean) => {
+      if (!connected) {
+        throw new Error('Database unavailable.');
+      }
+      return dbService.createDenormalized(name, unitType);
+    })
+    .then((mId: number) => {
+      id = mId;
+      switch (unitType) {
+        case UnitType.COMPANY:
+          return dbService.createUnit(divisionId, brigadeId, battalionId, id);
+        case UnitType.BATTALION:
+          return dbService.createUnit(divisionId, brigadeId, id, undefined);
+        case UnitType.BRIGADE:
+          return dbService.createUnit(divisionId, id, undefined, undefined);
+        case UnitType.DIVISION:
+          return dbService.createUnit(id, undefined, undefined, undefined);
+        default:
+          throw NOTIMP;
+      }
+    })
+    .then(() => ({ id, unitType, name }))
+    .catch((error) => {
+      throw error;
     });
 }
 

@@ -1,48 +1,55 @@
 import express, { Request, Response } from 'express';
 import {
-  getUnitsWithType, getUnit, renameUnit, deleteUnit,
+  getUnitsWithType, getUnit, renameUnit, deleteUnit, createUnit, getRelationship,
 } from '../services/dbManager';
 import {
-  DeleteUnitsBody, PostUnitsBody, PutUnitsBody, Unit,
+  DeleteUnitsBody, GetUnits, PostUnitsBody, PutUnitsBody, Unit,
 } from '../../utils/apiTypes';
 import { UnitType } from '../../utils/enums';
-import getChildUnits from '../services/unitServices';
-import { parseUnitType, validInt } from '../../utils/commons';
+import {
+  parseUnitType, parseUnitTypeLevel, unitTypeToLevel, validateUnitTypeForPost, validInt,
+} from '../../utils/commons';
 import checkPassword from '../services/authService';
 
 const router = express.Router();
 
-router.get('/units', (req: Request<unknown, unknown, unknown, {id: number | undefined}>, res: Response) => {
-  const { id } = req.query;
-  if (id === undefined) {
-    return getUnitsWithType(new Set([UnitType.BATTALION, UnitType.BRIGADE, UnitType.DIVISION]))
-      .then((units: Unit[]) => res.status(200).send({ units }))
-      .catch((error) => res.status(404).send({ errorMessage: error.message }));
+router.get('/units', (req: Request<unknown, unknown, unknown, GetUnits>, res: Response) => {
+  const { query } = req;
+  let unitsPromise : Promise<Unit[]>;
+  if (query.id === undefined && query.parentId === undefined) {
+    unitsPromise = getUnitsWithType(new Set([UnitType.BATTALION, UnitType.BRIGADE, UnitType.DIVISION]));
+  } else if (query.id !== undefined && query.parentId === undefined) {
+    unitsPromise = getUnit(query.id).then((unit : Unit) => [unit]);
+  } else if (query.parentId !== undefined && query.id === undefined) {
+    if (query.parentId < 0) {
+      unitsPromise = getUnitsWithType(new Set([UnitType.DIVISION]));
+    } else {
+      unitsPromise = getUnit(query.parentId)
+        .then((parent: Unit) => getRelationship(parent.id, parseUnitTypeLevel(unitTypeToLevel(parent.unitType) - 1))).catch((error: Error) => {
+          throw error;
+        });
+    }
+  } else {
+    unitsPromise = new Promise<Unit[]>(() => { throw new Error('Invalid Request.'); });
   }
-  return getUnit(id)
-    .then((unit: Unit) => res.status(200).send({ unit }))
+  return unitsPromise.then((units) => res.status(200).send({ units }))
     .catch((error) => res.status(404).send({ errorMessage: error.message }));
 });
 
-router.get('/units/:unitType', (req: Request<{unitType:string}, unknown, unknown, {parentId:number}>, res: Response) => {
-  const { unitType } = req.params;
-  const { parentId } = req.query;
-  if (parentId === undefined || unitType === undefined) {
+router.post('/units', checkPassword, (req: Request<unknown, unknown, PostUnitsBody>, res: Response) => {
+  const {
+    name, unitType, divisionId, brigadeId, battalionId,
+  } = req.body;
+
+  const type = parseUnitType(unitType);
+  if (!type
+    || !validateUnitTypeForPost(unitType, divisionId, brigadeId, battalionId)) {
     return res.status(404).send({ errorMessage: 'Invalid request query.' });
   }
-  const type = parseUnitType(unitType)!;
-  if (type === undefined) {
-    return res.status(404).send({ errorMessage: 'Invalid unitType.' });
-  }
-  return getChildUnits(parentId, type)
-    .then((units: Unit[]) => res.status(200).send({ units }))
-    .catch((error) => res.status(404).send({ errorMessage: error.message }));
-});
 
-router.post('/units', (req: Request<unknown, unknown, PostUnitsBody>, res: Response) => {
-  const { unitName, unitType, parentId } = req.body;
-  console.log(unitType + unitName + parentId);
-  return res.status(200).send({ body: req.body });
+  return createUnit(name, divisionId, brigadeId, battalionId, type)
+    .then((unit: Unit) => res.status(200).send({ unit }))
+    .catch((error) => res.status(404).send({ errorMessage: error.message }));
 });
 
 router.put('/units', checkPassword, (req: Request<unknown, unknown, PutUnitsBody>, res: Response) => {
