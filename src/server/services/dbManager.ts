@@ -1,8 +1,8 @@
 import { NOTIMP } from 'dns';
 import { UnitType } from '../../utils/enums';
 import { Unit } from '../../utils/apiTypes';
-import * as dbService from '../../database/sqlServer/dbService';
-import { isDBConnected } from '../../database/sqlServer/dbService';
+import * as sqlServerService from '../../database/sqlServer/dbService';
+import CustomError from '../../utils/errors';
 
 /**
  * Retrieve the unit given unit id
@@ -10,24 +10,24 @@ import { isDBConnected } from '../../database/sqlServer/dbService';
  * @returns {Promise<Unit>}
  */
 export function getUnit(unitId: number) : Promise<Unit> {
-  return isDBConnected()
+  return sqlServerService.isDBConnected()
     .then((connected: boolean) => {
       if (!connected) {
-        throw new Error('Database unavailable.');
+        throw new CustomError('Database unavailable.');
       }
-      return dbService.getUnit(unitId);
+      return sqlServerService.getUnit(unitId);
     })
     .then((unit: Unit) => {
       if (unit === undefined) {
-        throw new Error('Unknown unitId.');
+        throw new CustomError('Unknown unitId.');
       }
       return unit;
     })
     .catch((error) => {
-      if (error.message === 'Database unavailable.' || error.message === 'Unknown unitId.') {
+      if (error instanceof CustomError) {
         throw error;
       }
-      throw new Error('An unexpected error has occurs.');
+      throw new CustomError('An unexpected error has occurs.');
     });
 }
 
@@ -37,46 +37,46 @@ export function getUnit(unitId: number) : Promise<Unit> {
  * @returns {Promise<UnitType>}
  */
 export function getUnitType(unitId: number) : Promise<UnitType> {
-  return isDBConnected()
+  return sqlServerService.isDBConnected()
     .then((connected: boolean) => {
       if (!connected) {
-        throw new Error('Database unavailable.');
+        throw new CustomError('Database unavailable.');
       }
-      return dbService.getUnitType(unitId);
+      return sqlServerService.getUnitType(unitId);
     })
     .then((unitType: UnitType) => {
       if (unitType === undefined) {
-        throw new Error('Unknown unitId.');
+        throw new CustomError('Unknown unitId.');
       }
       return unitType;
     })
     .catch((error) => {
-      if (error.message === 'Database unavailable.' || error.message === 'Unknown unitId.') {
+      if (error instanceof CustomError) {
         throw error;
       }
-      throw new Error('An unexpected error has occurs.');
+      throw new CustomError('An unexpected error has occurs.');
     });
 }
 
 /**
- * Retrieve all units with specific types
- * @param {Unit} unitId
+ * Retrieve all units with specific unit types
+ * @param {Set<UnitType>} unitTypeSet
  * @returns {Promise<Unit[]>}
  */
 export function getUnitsWithType(unitTypeSet: Set<UnitType>): Promise<Unit[]> {
-  return isDBConnected()
+  return sqlServerService.isDBConnected()
     .then((connected: boolean) => {
       if (!connected) {
-        throw new Error('Database unavailable.');
+        throw new CustomError('Database unavailable.');
       }
-      return dbService.getUnitsWithType(unitTypeSet);
+      return sqlServerService.getUnitsWithType(unitTypeSet);
     })
     .then((units: Unit[]) => units)
     .catch((error) => {
-      if (error.message === 'Database unavailable.') {
+      if (error instanceof CustomError) {
         throw error;
       }
-      throw new Error('An unexpected error has occurs.');
+      throw new CustomError('An unexpected error has occurs.');
     });
 }
 
@@ -87,19 +87,19 @@ export function getUnitsWithType(unitTypeSet: Set<UnitType>): Promise<Unit[]> {
  * @returns {Promise<Unit[]>}
  */
 export function getNegativeRelationship(unitId: number, unitType: UnitType): Promise<Unit[]> {
-  return isDBConnected()
+  return sqlServerService.isDBConnected()
     .then((connected: boolean) => {
       if (!connected) {
-        throw new Error('Database unavailable.');
+        throw new CustomError('Database unavailable.');
       }
-      return dbService.getNegativeRelationship(unitId, unitType);
+      return sqlServerService.getNegativeRelationship(unitId, unitType);
     })
     .then((units: Unit[]) => units)
     .catch((error) => {
-      if (error.message === 'Database unavailable.') {
+      if (error instanceof CustomError) {
         throw error;
       }
-      throw new Error('An unexpected error has occurs.');
+      throw new CustomError('An unexpected error has occurs.');
     });
 }
 
@@ -110,19 +110,19 @@ export function getNegativeRelationship(unitId: number, unitType: UnitType): Pro
  * @returns {Promise<Unit[]>}
  */
 export function getRelationship(unitId: number, unitType: UnitType): Promise<Unit[]> {
-  return isDBConnected()
+  return sqlServerService.isDBConnected()
     .then((connected: boolean) => {
       if (!connected) {
-        throw new Error('Database unavailable.');
+        throw new CustomError('Database unavailable.');
       }
-      return dbService.getRelationship(unitId, unitType);
+      return sqlServerService.getRelationship(unitId, unitType);
     })
     .then((units: Unit[]) => units)
     .catch((error) => {
-      if (error.message === 'Database unavailable.') {
+      if (error instanceof CustomError) {
         throw error;
       }
-      throw new Error('An unexpected error has occurs.');
+      throw new CustomError('An unexpected error has occurs.');
     });
 }
 
@@ -134,10 +134,10 @@ export function getRelationship(unitId: number, unitType: UnitType): Promise<Uni
  */
 export function deleteUnit(unitId: number, unitType: UnitType): Promise<boolean> {
   // let unitsToDelete:Unit[];
-  return isDBConnected()
+  return sqlServerService.isDBConnected()
     .then((connected: boolean) => {
       if (!connected) {
-        throw new Error('Database unavailable.');
+        throw new CustomError('Database unavailable.');
       }
       let divisionStr = '';
       let brigadeStr = '';
@@ -153,71 +153,79 @@ export function deleteUnit(unitId: number, unitType: UnitType): Promise<boolean>
       } else if (unitType === UnitType.BATTALION) {
         battalionStr = 'battalion';
       }
-      return dbService.getUnitstToBeDeleted(unitId, unitType, [divisionStr, brigadeStr, battalionStr, 'company']);
+      return sqlServerService.getUnitstToBeDeleted(unitId, unitType, [divisionStr, brigadeStr, battalionStr, 'company']);
     })
     .then((units: Unit[]) => {
       if (units.length === 0) {
-        throw new Error('No units can be deleted');
+        throw new CustomError('No units can be deleted');
       }
-      return dbService.deleteUnits(unitId, unitType, units);
+      return sqlServerService.deleteUnits(unitId, unitType, units);
     })
     .then((success: boolean) => success)
     .catch((error) => {
-      if (error.message === 'Database unavailable.' || error.message === 'No units can be deleted') {
+      if (error instanceof CustomError) {
         throw error;
       }
-      throw new Error('Unable to delete the unit');
+      throw new CustomError('Unable to delete the unit');
     });
 }
 
-export function createUnit(name: string, divisionId: number | undefined, brigadeId: number | undefined,
-  battalionId: number | undefined, unitType: UnitType): Promise<Unit> {
+export function createUnit(
+  name: string,
+  unitType: UnitType,
+  divisionId?: number,
+  brigadeId?: number,
+  battalionId?: number,
+): Promise<Unit> {
   let id = 0;
-  return isDBConnected()
+  return sqlServerService.isDBConnected()
     .then((connected: boolean) => {
       if (!connected) {
-        throw new Error('Database unavailable.');
+        throw new CustomError('Database unavailable.');
       }
-      return dbService.createDenormalized(name, unitType);
+      return sqlServerService.createDenormalized(name, unitType);
     })
     .then((mId: number) => {
       id = mId;
       switch (unitType) {
         case UnitType.COMPANY:
-          return dbService.createUnit(divisionId, brigadeId, battalionId, id);
+          return sqlServerService.createUnit(divisionId!, brigadeId!, battalionId!, id);
         case UnitType.BATTALION:
-          return dbService.createUnit(divisionId, brigadeId, id, undefined);
+          return sqlServerService.createUnit(divisionId!, brigadeId!, id, null);
         case UnitType.BRIGADE:
-          return dbService.createUnit(divisionId, id, undefined, undefined);
+          return sqlServerService.createUnit(divisionId!, id, null, null);
         case UnitType.DIVISION:
-          return dbService.createUnit(id, undefined, undefined, undefined);
+          return sqlServerService.createUnit(id, null, null, null);
         default:
           throw NOTIMP;
       }
     })
     .then(() => ({ id, unitType, name }))
     .catch((error) => {
-      throw error;
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      throw new CustomError('An unexpected error has occurs.');
     });
 }
 
 export function renameUnit(unitId: number, newName:string): Promise<void> {
-  return isDBConnected()
+  return sqlServerService.isDBConnected()
     .then((connected: boolean) => {
       if (!connected) {
-        throw new Error('Database unavailable.');
+        throw new CustomError('Database unavailable.');
       }
-      return dbService.renameUnit(unitId, newName);
+      return sqlServerService.renameUnit(unitId, newName);
     })
     .then((rowAffected: number) => {
       if (rowAffected !== 1) {
-        throw new Error('Unknown unitId.');
+        throw new CustomError('Unknown unitId.');
       }
     })
     .catch((error) => {
-      if (error.message === 'Database unavailable.' || error.message === 'Unknown unitId.') {
+      if (error instanceof CustomError) {
         throw error;
       }
-      throw new Error('An unexpected error has occurs.');
+      throw new CustomError('An unexpected error has occurs.');
     });
 }

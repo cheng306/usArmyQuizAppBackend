@@ -50,10 +50,10 @@ export type QuestionTemplate = {
 
 /**
  * Type of the GetUnitsQuery
- * @field {number} id - Optional unique Identifiger of this unit
+ * @field {number} unitId - Optional unique Identifiger of this unit
  */
 export type GetUnitsQuery = {
-  unitId: number | undefined,
+  unitId?: number,
 }
 
 /**
@@ -70,8 +70,8 @@ export type GetUnitsChildrenQuery = {
  * @field {number} parentId - parent id
  */
 export type GetUnits = {
-  id: number | undefined;
-  parentId: number | undefined;
+  id?: number;
+  parentId?: number;
 }
 
 /**
@@ -84,9 +84,9 @@ export type GetUnits = {
 export type PostUnitsBody = {
   name: string,
   unitType: UnitType,
-  divisionId: number | undefined,
-  brigadeId: number | undefined,
-  battalionId: number | undefined
+  divisionId?: number,
+  brigadeId?: number,
+  battalionId?: number
 }
 
 /**
