@@ -59,6 +59,15 @@ export function unitTypeToLevel(unitType: UnitType) : number {
   return unitTypeLevelMap.get(unitType)!;
 }
 
+const unitTypeRankMap : UnitType[] = [UnitType.COMPANY, UnitType.BATTALION, UnitType.BRIGADE, UnitType.DIVISION];
+
+export function parseUnitTypeLevel(level: number) : UnitType {
+  if (level >= unitTypeRankMap.length) {
+    throw new Error('Level cannot greater than length of the Ranking Map');
+  }
+  return unitTypeRankMap[level];
+}
+
 export function validInt(value: string): boolean {
   return Number.isInteger(parseInt(String(value), 10));
 }
