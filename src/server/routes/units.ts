@@ -60,7 +60,7 @@ router.post('/units', checkPassword, (req: Request<unknown, unknown, PostUnitsBo
     return res.status(404).send({ errorMessage: 'Invalid request query.' });
   }
 
-  return createUnit(name, divisionId, brigadeId, battalionId, type)
+  return createUnit(name, type, divisionId, brigadeId, battalionId)
     .then((unit: Unit) => res.status(201).send({ unit }))
     .catch((error) => res.status(404).send({ errorMessage: error.message }));
 });

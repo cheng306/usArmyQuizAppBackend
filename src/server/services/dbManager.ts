@@ -170,8 +170,13 @@ export function deleteUnit(unitId: number, unitType: UnitType): Promise<boolean>
     });
 }
 
-export function createUnit(name: string, divisionId: number | undefined, brigadeId: number | undefined,
-  battalionId: number | undefined, unitType: UnitType): Promise<Unit> {
+export function createUnit(
+  name: string,
+  unitType: UnitType,
+  divisionId?: number,
+  brigadeId?: number,
+  battalionId?: number,
+): Promise<Unit> {
   let id = 0;
   return sqlServerService.isDBConnected()
     .then((connected: boolean) => {
@@ -184,13 +189,13 @@ export function createUnit(name: string, divisionId: number | undefined, brigade
       id = mId;
       switch (unitType) {
         case UnitType.COMPANY:
-          return sqlServerService.createUnit(divisionId, brigadeId, battalionId, id);
+          return sqlServerService.createUnit(divisionId!, brigadeId!, battalionId!, id);
         case UnitType.BATTALION:
-          return sqlServerService.createUnit(divisionId, brigadeId, id, undefined);
+          return sqlServerService.createUnit(divisionId!, brigadeId!, id, null);
         case UnitType.BRIGADE:
-          return sqlServerService.createUnit(divisionId, id, undefined, undefined);
+          return sqlServerService.createUnit(divisionId!, id, null, null);
         case UnitType.DIVISION:
-          return sqlServerService.createUnit(id, undefined, undefined, undefined);
+          return sqlServerService.createUnit(id, null, null, null);
         default:
           throw NOTIMP;
       }
