@@ -14,20 +14,22 @@ const router = express.Router();
 
 router.get('/units', (req: Request<unknown, unknown, unknown, GetUnits>, res: Response) => {
   const { query } = req;
+  let unitsPromise : Promise<Unit[]>;
   if (query.id === undefined && query.parentId === undefined) {
-    return getUnitsWithType(new Set([UnitType.BATTALION, UnitType.BRIGADE, UnitType.DIVISION]))
-      .then((units: Unit[]) => res.status(200).send({ units }))
-      .catch((error) => res.status(404).send({ errorMessage: error.message }));
-  } if (query.id !== undefined) {
-    return getUnit(query.id)
-      .then((unit: Unit) => res.status(200).send({ unit }))
-      .catch((error) => res.status(404).send({ errorMessage: error.message }));
-  } if (query.parentId !== undefined) {
-    return getChildUnits(query.parentId)
-      .then((units: Unit[]) => res.status(200).send({ units }))
-      .catch((error) => res.status(404).send({ errorMessage: error.message }));
+    unitsPromise = getUnitsWithType(new Set([UnitType.BATTALION, UnitType.BRIGADE, UnitType.DIVISION]));
+  } else if (query.id !== undefined && query.parentId === undefined) {
+    unitsPromise = getUnit(query.id).then((unit : Unit) => [unit]);
+  } else if (query.parentId !== undefined && query.id === undefined) {
+    if (query.parentId < 0) {
+      unitsPromise = getUnitsWithType(new Set([UnitType.DIVISION]));
+    } else {
+      unitsPromise = getChildUnits(query.parentId);
+    }
+  } else {
+    unitsPromise = new Promise<Unit[]>(() => { throw new Error('Invalid Request.'); });
   }
-  return res.status(404).send({ errorMessage: 'Invalid Request.' });
+  return unitsPromise.then((units) => res.status(200).send({ units }))
+    .catch((error) => res.status(404).send({ errorMessage: error.message }));
 });
 
 router.post('/units', (req: Request<unknown, unknown, PostUnitsBody>, res: Response) => {
