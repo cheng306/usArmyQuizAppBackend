@@ -1,13 +1,26 @@
 import express, { Request, Response } from 'express';
 import {
-  getUnitsWithType, getUnit, renameUnit, deleteUnit, createUnit, getRelationship,
+  getUnitsWithType,
+  getUnit,
+  renameUnit,
+  deleteUnit,
+  createUnit,
+  getRelationship,
 } from '../services/dbManager';
 import {
-  DeleteUnitsBody, GetUnits, PostUnitsBody, PutUnitsBody, Unit,
+  DeleteUnitsBody,
+  GetUnits,
+  PostUnitsBody,
+  PutUnitsBody,
+  Unit,
 } from '../../utils/apiTypes';
 import { UnitType } from '../../utils/enums';
 import {
-  parseUnitType, parseUnitTypeLevel, unitTypeToLevel, validateUnitTypeForPost, validInt,
+  parseUnitType,
+  parseUnitTypeLevel,
+  unitTypeToLevel,
+  validateUnitTypeForPost,
+  validInt,
 } from '../../utils/commons';
 import checkPassword from '../services/authService';
 
